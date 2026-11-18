@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NLP Ôn tập – Quiz & Flashcard Bài 1–6</title>
+<meta name="theme-color" content="#2f5d50">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="NLP Quiz">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f5f1; --card:#ffffff; --ink:#1d1d1b; --muted:#6b6a64; --line:#e4e2da;
+  --accent:#2f5d50; --accent-soft:#e3eee9; --ok:#1f7a4d; --ok-soft:#e1f3e9; --bad:#b3372f; --bad-soft:#fbe7e5;
+  --hard:#8a5a00; --hard-soft:#fbf0d9; --x:#4b3fa0; --x-soft:#ebe8fa; --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 24px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#161614; --card:#201f1d; --ink:#ecebe6; --muted:#a3a19a; --line:#34332f;
+  --accent:#7fc4ab; --accent-soft:#22332d; --ok:#6fd19c; --ok-soft:#1d3327; --bad:#f08a80; --bad-soft:#3a2321;
+  --hard:#f0c060; --hard-soft:#3a3020; --x:#b3a9f5; --x-soft:#2a2645; --shadow:none;}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro",system-ui,sans-serif;font-size:16px;line-height:1.55}
+.wrap{max-width:860px;margin:0 auto;padding:24px 18px 80px}
+header h1{font-size:24px;margin:0 0 4px;letter-spacing:-.01em}
+header p{margin:0;color:var(--muted);font-size:14px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:16px;box-shadow:var(--shadow)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row+.row{margin-top:10px}
+.lbl{font-size:13px;color:var(--muted);min-width:64px}
+.chip{border:1px solid var(--line);background:transparent;color:var(--ink);padding:6px 12px;border-radius:999px;font:inherit;font-size:14px;cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--card)}
+.chip small{opacity:.7;margin-left:4px}
+.tabs{display:flex;gap:4px;background:var(--line);padding:4px;border-radius:12px;margin-top:16px}
+.tab{flex:1;border:0;background:transparent;color:var(--muted);padding:9px 6px;border-radius:9px;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.tab.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.meta{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);margin-bottom:10px;gap:8px;flex-wrap:wrap}
+.bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin-bottom:14px}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent);margin-right:6px}
+.tag.h{background:var(--hard-soft);color:var(--hard)}
+.tag.x{background:var(--x-soft);color:var(--x)}
+.q{font-size:19px;font-weight:600;margin:6px 0 16px;line-height:1.45}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:12px 14px;border-radius:11px;font:inherit;cursor:pointer;transition:border-color .15s,background .15s}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .k{flex:none;width:26px;height:26px;border-radius:7px;background:var(--line);display:grid;place-items:center;font-weight:700;font-size:13px}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)} .opt.ok .k{background:var(--ok);color:var(--card)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)} .opt.bad .k{background:var(--bad);color:var(--card)}
+.opt:disabled{cursor:default}
+.exp{margin-top:14px;padding:12px 14px;border-radius:11px;background:var(--accent-soft);font-size:15px}
+.exp b{display:block;margin-bottom:2px}
+.actions{display:flex;gap:8px;justify-content:space-between;margin-top:16px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 16px;border-radius:10px;font:inherit;font-weight:600;cursor:pointer}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--card)}
+.btn.okb{background:var(--ok);border-color:var(--ok);color:var(--card)}
+.btn.badb{background:var(--bad);border-color:var(--bad);color:var(--card)}
+.btn:disabled{opacity:.45;cursor:default}
+.hint{font-size:12px;color:var(--muted);margin-top:12px;text-align:center}
+.flip{perspective:1400px;cursor:pointer}
+.flip .in{position:relative;transition:transform .45s;transform-style:preserve-3d;min-height:300px}
+.flip.on .in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid var(--line);border-radius:14px;padding:22px;background:var(--card);display:flex;flex-direction:column;overflow:auto}
+.face.back{transform:rotateY(180deg);background:var(--accent-soft)}
+.face .lst{margin:6px 0 0;padding-left:0;list-style:none;color:var(--muted);font-size:15px}
+.face .lst li{padding:3px 0}
+.ans{font-size:19px;font-weight:700;color:var(--ok);margin:8px 0 12px}
+.center{text-align:center;padding:30px 10px}
+.big{font-size:44px;font-weight:700;margin:6px 0}
+.list details{border-top:1px solid var(--line);padding:10px 0}
+.list summary{cursor:pointer;font-weight:600;list-style:none}
+.list summary::-webkit-details-marker{display:none}
+.list .a{color:var(--ok);font-weight:600;margin-top:6px}
+.list .e{color:var(--muted);font-size:14px}
+.search{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;margin-bottom:8px}
+.empty{color:var(--muted);text-align:center;padding:30px}
+.small{font-size:13px;color:var(--muted)}
+.fsum{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.fsum::-webkit-details-marker{display:none}.fsum b::after{content:" ▾";color:var(--muted)}details[open] .fsum b::after{content:" ▴"}
+.toggle{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);cursor:pointer}
+@media (max-width:560px){.hint{display:none}.opt{padding:14px 12px}header p{display:none}header h1{font-size:20px}.chip{padding:5px 10px;font-size:13px}.tabs{margin-top:12px}.q{font-size:17px}.tab{font-size:13px}.flip .in{min-height:360px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>NLP – Ôn tập Bài 1 → 6</h1>
+  <p>Ngân hàng <b id="total"></b> câu trắc nghiệm (dễ & khó): <b id="nS"></b> câu bám sát slide và <b id="nX"></b> câu bổ sung kiến thức mở rộng (mô hình, kỹ thuật, độ đo liên quan ngoài slide). Bài 1 soạn theo đề cương vì dự án chưa có slide bài này.</p>
+</header>
+
+<details class="panel" id="filt" open>
+  <summary class="fsum"><b>Bộ lọc</b> <span id="fsumTxt" class="small"></span></summary>
+  <div class="row" style="margin-top:12px"><span class="lbl">Bài</span><div class="row" id="lessons"></div></div>
+  <div class="row"><span class="lbl">Nguồn</span>
+    <button class="chip" data-src="all">Tất cả</button>
+    <button class="chip on" data-src="S">Theo slide</button>
+    <button class="chip" data-src="X">Bổ sung kiến thức</button>
+  </div>
+  <div class="row"><span class="lbl">Mức độ</span>
+    <button class="chip on" data-lv="all">Tất cả</button>
+    <button class="chip" data-lv="E">Dễ</button>
+    <button class="chip" data-lv="H">Khó</button>
+    <span style="flex:1"></span>
+    <label class="toggle"><input type="checkbox" id="shuf" checked> Xáo trộn câu</label>
+  </div>
+  <div class="row small" id="selInfo" style="margin-top:10px"></div>
+</details>
+
+<div class="tabs">
+  <button class="tab on" data-m="quiz">Quiz</button>
+  <button class="tab" data-m="flash">Flashcard</button>
+  <button class="tab" data-m="wrong">Ôn câu sai <span id="wrongN"></span></button>
+  <button class="tab" data-m="list">Bảng ôn</button>
+</div>
+
+<div class="panel" id="stage"></div>
+</div>
+
+<script>
+// Format: [bài, độ khó (E=dễ, H=khó), câu hỏi, đáp án đúng, [phương án sai], giải thích]
+const Q_A = [
+// ================= BÀI 1 – NLP và ứng dụng (theo đề cương + kiến thức nền) =================
+["1","E","Xử lý ngôn ngữ tự nhiên (NLP) là lĩnh vực nghiên cứu điều gì?","Giúp máy tính hiểu, phân tích và sinh ngôn ngữ của con người","Thiết kế ngôn ngữ lập trình mới cho máy tính",["Nén dữ liệu văn bản để lưu trữ hiệu quả","Nhận dạng ảnh chữ viết tay bằng xử lý ảnh thuần túy"],"NLP là giao thoa giữa KHMT, AI và ngôn ngữ học, nhằm cho máy hiểu và sinh ngôn ngữ tự nhiên."],
+["1","E","Ứng dụng nào sau đây KHÔNG thuộc nhóm ứng dụng NLP được nêu trong đề cương môn học?","Phát hiện vật thể trong ảnh","Kiểm tra lỗi chính tả",["Phát hiện đạo văn","Dịch máy"],"Đề cương liệt kê: kiểm tra chính tả, phát hiện đạo văn, phân tích cảm xúc, nhận dạng thực thể, phân lớp, tóm tắt, dịch máy, hỏi đáp. Phát hiện vật thể là bài toán thị giác máy tính."],
+["1","E","Thư viện Python nào được đề cương nêu tên trong mục 'Một số thư viện và công cụ cho NLP'?","NLTK (Natural Language Toolkit)","OpenCV",["Pandas Profiling","Matplotlib"],"Mục 1.4.1 của đề cương: Thư viện NLTK (Natural Language Toolkit)."],
+["1","E","Thứ tự hợp lý của quy trình xây dựng một ứng dụng NLP là gì?","Thu thập dữ liệu → Tiền xử lý → Trích chọn đặc trưng/biểu diễn → Huấn luyện mô hình → Đánh giá → Triển khai","Huấn luyện mô hình → Thu thập dữ liệu → Đánh giá → Tiền xử lý",["Tiền xử lý → Triển khai → Thu thập dữ liệu → Đánh giá","Đánh giá → Trích chọn đặc trưng → Thu thập dữ liệu → Huấn luyện"],"Pipeline điển hình: dữ liệu → làm sạch/tiền xử lý → biểu diễn → mô hình → đánh giá → triển khai (và lặp lại)."],
+["1","E","Tách từ (tokenization) là gì?","Chia văn bản thành các đơn vị nhỏ hơn như từ hoặc subword","Gán nhãn từ loại cho mỗi từ",["Đưa từ về dạng gốc theo từ điển","Loại bỏ các từ dừng (stopwords)"],"Tokenization tách chuỗi ký tự thành token; là bước đầu của hầu hết pipeline NLP."],
+["1","E","Stopwords là gì?","Những từ xuất hiện rất thường xuyên nhưng ít mang nghĩa phân biệt (the, a, là, của…)","Những từ không có trong từ điển (OOV)",["Những từ đánh dấu kết thúc câu","Những từ hiếm chỉ xuất hiện một lần"],"Stopwords thường được loại bỏ trong các mô hình dựa trên đếm như BoW/TF-IDF."],
+["1","H","Điểm khác nhau chính giữa stemming và lemmatization là gì?","Stemming cắt hậu tố theo luật nên có thể ra từ không có thật; lemmatization dùng từ điển/từ loại để trả về dạng gốc hợp lệ","Stemming dùng từ điển, lemmatization chỉ cắt hậu tố",["Hai kỹ thuật cho kết quả luôn giống nhau","Lemmatization chỉ áp dụng cho tiếng Việt"],"Ví dụ: 'studies' → stem 'studi', lemma 'study'; 'better' → lemma 'good' (cần thông tin từ loại)."],
+["1","H","Vì sao tách từ trong tiếng Việt khó hơn tiếng Anh?","Tiếng Việt là ngôn ngữ đơn lập, khoảng trắng tách âm tiết chứ không tách từ (ví dụ 'học sinh' là một từ gồm 2 âm tiết)","Tiếng Việt không dùng khoảng trắng",["Tiếng Việt không có dấu câu","Tiếng Việt có quá ít từ vựng"],"Ranh giới từ tiếng Việt không trùng khoảng trắng nên cần công cụ tách từ (VnCoreNLP, pyvi, underthesea…)."],
+["1","E","Bài toán phân tích cảm xúc (sentiment analysis) thuộc loại bài toán nào?","Phân lớp văn bản","Sinh văn bản",["Gán nhãn chuỗi","Dịch máy"],"Mỗi văn bản được gán một nhãn cảm xúc (tích cực/tiêu cực/trung tính)."],
+["1","E","Nhận dạng thực thể có tên (NER) thuộc loại bài toán nào?","Gán nhãn chuỗi (sequence labeling)","Phân cụm văn bản",["Hồi quy","Sinh tóm tắt"],"NER gán nhãn cho từng token (PER, LOC, ORG, O…), là bài toán gán nhãn chuỗi."],
+["1","H","Bài toán dịch máy, tóm tắt văn bản sinh (abstractive) có đặc điểm chung nào về dạng đầu vào/đầu ra?","Đầu vào và đầu ra đều là chuỗi có độ dài thay đổi (sequence-to-sequence)","Đầu ra là một nhãn duy nhất",["Đầu ra có cùng độ dài với đầu vào","Đầu vào là ảnh, đầu ra là văn bản"],"Đây là nhóm bài toán seq2seq, thường giải bằng kiến trúc encoder–decoder (Bài 5, 6)."],
+["1","E","Biểu thức chính quy (regular expression) thường dùng trong NLP để làm gì?","Tìm kiếm/trích xuất/làm sạch mẫu chuỗi như email, số điện thoại, thẻ HTML","Huấn luyện mô hình ngôn ngữ",["Tính độ tương tự cosine","Giảm chiều dữ liệu"],"Slide Bài 2 dùng regex để tiền xử lý dữ liệu web nhiễu và trích số, email."],
+["1","H","Ngôn ngữ tự nhiên có tính nhập nhằng (ambiguity). Câu 'I saw the man with the telescope' minh họa loại nhập nhằng nào?","Nhập nhằng cấu trúc/cú pháp (gắn cụm giới từ)","Nhập nhằng chính tả",["Nhập nhằng âm vị","Không có nhập nhằng"],"'with the telescope' có thể bổ nghĩa cho 'saw' hoặc 'the man' → hai cây cú pháp khác nhau."],
+["1","E","Đề cương xác định các học phần tiên quyết (học phần trước) của môn NLP là gì?","Học máy, Học sâu","Cấu trúc dữ liệu, Mạng máy tính",["Xác suất thống kê, Đại số tuyến tính","Thị giác máy tính"],"Mục I đề cương: Học phần trước: Học máy, Học sâu."],
+["1","E","Theo đề cương, điểm học phần được tính như thế nào?","DHP = 0,1·A1 + 0,3·A2 + 0,6·A3","DHP = 0,2·A1 + 0,3·A2 + 0,5·A3",["DHP = 0,1·A1 + 0,4·A2 + 0,5·A3","DHP = 0,3·A1 + 0,3·A2 + 0,4·A3"],"A1 thường xuyên (10%), A2 quá trình – trắc nghiệm sau Bài 7 (30%), A3 thi kết thúc – trắc nghiệm, vấn đáp BTL (60%)."],
+["1","H","Một hệ thống chatbot hỏi đáp dựa trên LLM + RAG cần những thành phần NLP nào?","Truy hồi văn bản liên quan (biểu diễn/embedding + tìm kiếm tương tự) và mô hình sinh câu trả lời","Chỉ cần bộ đếm từ BoW",["Chỉ cần bộ tách từ","Chỉ cần bộ gán nhãn từ loại"],"RAG = Retrieval (embedding, vector search) + Generation (LLM) — nội dung Bài 7–8, nhưng dựa trên biểu diễn từ/câu ở Bài 3, 6."],
+["1","E","Corpus (kho ngữ liệu) là gì?","Tập hợp lớn các văn bản dùng để huấn luyện/đánh giá mô hình","Một mô hình ngôn ngữ đã huấn luyện",["Danh sách các stopwords","Một thuật toán phân lớp"],"Ví dụ: Enron Spam Corpus, Ling Spam Corpus (Bài 2), Wikipedia, BooksCorpus (BERT)."],
+
+// ================= BÀI 2 – Trích chọn đặc trưng, Naive Bayes, lọc thư rác =================
+["2","E","Lọc thư rác (spam filtering) là một dạng của bài toán nào?","Phân loại văn bản (spam vs ham)","Dịch máy",["Nhận dạng thực thể","Tóm tắt văn bản"],"Slide: lọc thư rác là một dạng của phân loại văn bản, phân email thành Spam hoặc Ham."],
+["2","E","Trong bài toán lọc thư rác, 'ham' là gì?","Email bình thường (không phải rác)","Email quảng cáo",["Email chứa virus","Email bị trùng lặp"],"Ham = email bình thường, spam = email rác."],
+["2","E","Hai kho ngữ liệu email được slide nêu cho bài toán lọc thư rác là gì?","Ling Spam Corpus và Enron Spam Corpus","Penn Treebank và WordNet",["SQuAD và GLUE","CoNLL 2003 và MNLI"],"Slide: kho ngữ liệu mail sử dụng: Ling Spam Corpus & Enron Spam Corpus."],
+["2","H","Kho email Enron trong slide gồm bao nhiêu email và chia thành mấy thư mục?","33.716 email trong 6 thư mục","16.545 email trong 2 thư mục",["17.171 email trong 6 thư mục","80.000 email trong 10 thư mục"],"33.716 email, 6 thư mục; trong đó 16.545 spam và 17.171 ham."],
+["2","H","Trong kho Enron, số email spam và ham tương ứng là bao nhiêu?","16.545 spam và 17.171 ham","17.171 spam và 16.545 ham",["10.000 spam và 23.716 ham","Mỗi loại 16.858"],"Slide: tổng số email rác và bình thường tương ứng là 16.545 và 17.171 (dữ liệu khá cân bằng)."],
+["2","E","Ưu điểm của phương pháp phân loại dựa trên luật thủ công (hand-coded rules) là gì?","Độ chính xác có thể cao nếu luật được chuyên gia thiết kế cẩn thận","Chi phí xây dựng và duy trì thấp",["Tự động thích nghi với dữ liệu mới","Không cần kiến thức chuyên gia"],"Slide: độ chính xác có thể cao nếu luật được thiết kế cẩn thận, nhưng xây dựng và duy trì luật tốn kém."],
+["2","E","Nhược điểm chính của phương pháp dựa trên luật thủ công là gì?","Xây dựng và duy trì bộ luật tốn kém","Độ chính xác luôn thấp",["Cần GPU để chạy","Cần dữ liệu gán nhãn rất lớn"],"Ví dụ luật: spam: black-list-address OR ('dollars' AND 'have been selected')."],
+["2","E","Trong học máy có giám sát cho phân loại văn bản, đầu ra cần học là gì?","Một bộ phân lớp γ: d → c","Một tập văn bản mới",["Một ma trận đồng xuất hiện","Một từ điển stopwords"],"Đầu vào: văn bản d, tập lớp C, tập huấn luyện (d1,c1)…(dm,cm); đầu ra: bộ phân lớp γ."],
+["2","E","Phương pháp nào sau đây KHÔNG được slide liệt kê là bộ phân lớp cho phân loại văn bản?","K-means","Naive Bayes",["Logistic regression","Support vector machines"],"Slide liệt kê: Naive Bayes, Logistic regression, SVM, Neural Network. K-means là phân cụm (không giám sát)."],
+["2","E","Theo slide, đặc trưng (feature) là gì?","Một biến có thể đo lường, khác biệt của đối tượng mà ta muốn mô hình hóa","Nhãn lớp của dữ liệu",["Tham số của mô hình","Hàm mất mát"],"Nên chọn đặc trưng hữu ích để phân lớp; cần đủ đặc trưng nhưng không quá nhiều."],
+["2","E","Vector hóa (vectorization) văn bản là gì?","Quá trình biến tập văn bản thành các vector đặc trưng số thực","Quá trình dịch văn bản sang ngôn ngữ khác",["Quá trình nén văn bản","Quá trình gán nhãn từ loại"],"Slide: chiến lược tokenization, counting, normalization được gọi là Bag of Words."],
+["2","E","Chiến lược tokenization + counting + normalization để vector hóa văn bản được gọi là gì?","Bag of Words (BoW)","Word2Vec",["Attention","Beam search"],"Dùng CountVectorizer để thực hiện BoW."],
+["2","E","Nhược điểm chính của mô hình túi từ (BoW) mà slide nêu là gì?","Không biểu diễn được thứ tự các từ một cách hiệu quả","Không đếm được tần suất từ",["Không áp dụng được với tiếng Anh","Vector quá ngắn"],"Slide: BOW không biểu diễn được thứ tự từ → sử dụng N-grams."],
+["2","E","Câu 'I am learning NLP' có bao nhiêu bi-gram?","3","4",["2","6"],"Bi-grams: 'I am', 'am learning', 'learning NLP'. Câu n token có n−1 bi-gram."],
+["2","H","Câu gồm n token có bao nhiêu N-gram bậc k (không thêm token đệm)?","n − k + 1","n − k",["n·k","n / k"],"Ví dụ n=4, k=2 → 3 bi-gram; k=1 → 4 uni-gram."],
+["2","E","Ma trận đồng xuất hiện (co-occurrence matrix) đếm điều gì?","Số lần các cặp từ xuất hiện cùng nhau (trong cùng ngữ cảnh/cửa sổ)","Số lần mỗi văn bản thuộc một lớp",["Số ký tự của mỗi từ","Xác suất hậu nghiệm của mỗi lớp"],"Thống kê đồng xuất hiện mô tả các từ thường đi cùng nhau, từ đó biểu diễn quan hệ giữa các từ."],
+["2","H","Với tập 'I like deep learning. I like NLP. I enjoy flying.' và cửa sổ kích thước 1, giá trị đồng xuất hiện của cặp (I, like) là bao nhiêu?","2","1",["3","0"],"'I like' xuất hiện ở câu 1 và câu 2 → 2. Còn (I, enjoy) = 1, (like, deep) = 1, (like, NLP) = 1."],
+["2","E","TF-IDF đánh trọng số cao cho từ như thế nào?","Từ xuất hiện nhiều trong văn bản đang xét nhưng xuất hiện ở ít văn bản trong tập","Từ xuất hiện ở hầu hết các văn bản",["Từ dài nhất trong văn bản","Từ xuất hiện đầu tiên trong văn bản"],"TF cao × IDF cao. Từ phổ biến khắp nơi (stopwords) có IDF thấp."],
+["2","H","Công thức IDF phổ biến của từ t là gì (N = số văn bản, df(t) = số văn bản chứa t)?","idf(t) = log(N / df(t))","idf(t) = df(t) / N",["idf(t) = N · df(t)","idf(t) = log(df(t))"],"TF-IDF(t,d) = tf(t,d) × log(N/df(t)). Từ xuất hiện trong mọi văn bản có idf = log 1 = 0."],
+["2","H","Một từ xuất hiện trong TẤT CẢ các văn bản của tập sẽ có TF-IDF (theo công thức log(N/df)) bằng bao nhiêu?","0","1",["Bằng TF của nó","Vô cùng"],"df = N → log(N/N) = log 1 = 0, nên trọng số bằng 0 dù TF lớn."],
+["2","E","Giả định 'naive' trong Naive Bayes là gì?","Các thuộc tính (từ) độc lập có điều kiện với nhau khi biết lớp","Các lớp có xác suất tiền nghiệm bằng nhau",["Các từ có thứ tự cố định","Dữ liệu tuân theo phân phối chuẩn"],"Slide: các thuộc tính mô tả dữ liệu là độc lập điều kiện theo giả thuyết phân lớp."],
+["2","E","Naive Bayes gán văn bản mới vào lớp nào?","Lớp có xác suất hậu nghiệm P(class | document) cao nhất","Lớp có nhiều mẫu huấn luyện nhất",["Lớp có likelihood nhỏ nhất","Lớp được chọn ngẫu nhiên"],"Ví dụ: email là spam nếu P(spam|message) > P(¬spam|message) — cực đại hậu nghiệm (MAP)."],
+["2","H","Theo định lý Bayes, P(class | document) tỉ lệ thuận với biểu thức nào?","P(document | class) · P(class)","P(class | document) · P(document)",["P(document) / P(class)","P(class) / P(document | class)"],"P(c|d) = P(d|c)P(c)/P(d); P(d) không phụ thuộc lớp nên bỏ qua khi so sánh."],
+["2","H","Với giả định BoW và độc lập điều kiện, P(document | class) được tính như thế nào?","Tích các P(wi | class) với i = 1..n","Tổng các P(wi | class)",["P(w1 | class) của từ đầu tiên","max các P(wi | class)"],"P(w1,…,wn | class) = ∏ P(wi | class); thực tế thường cộng log để tránh underflow."],
+["2","E","Hai loại tham số cần ước lượng trong Naive Bayes là gì?","Likelihood P(word | class) và prior P(class)","Trọng số W và bias b",["Learning rate và batch size","Query và Key"],"Ví dụ trong slide: prior spam 0.33, ¬spam 0.67."],
+["2","H","Ước lượng Maximum Likelihood của P(word | class) là gì?","Số lần từ xuất hiện trong các văn bản thuộc lớp / tổng số từ trong các văn bản thuộc lớp","Số văn bản chứa từ / tổng số văn bản",["Số lớp chứa từ / tổng số lớp","1 / kích thước từ vựng"],"Đây là ước lượng đếm (counting) trên tập huấn luyện."],
+["2","E","Làm mịn Laplace (Laplacian smoothing) giải quyết vấn đề gì?","Từ không xuất hiện trong lớp khiến xác suất bằng 0 làm cả tích bằng 0","Văn bản quá dài",["Mất cân bằng nhãn","Tốc độ huấn luyện chậm"],"Slide: làm mịn tham số xử lý trường hợp từ không xuất hiện hoặc xuất hiện quá nhiều."],
+["2","H","Công thức làm mịn Laplace cho P(word | class) là gì (V = số từ khác nhau)?","(count(word, class) + 1) / (tổng số từ của lớp + V)","(count(word, class) + 1) / (tổng số từ của lớp + 1)",["count(word, class) / (tổng số từ của lớp + V)","(count(word, class) + V) / (tổng số từ của lớp + 1)"],"Cộng 1 vào tử cho mọi từ → mẫu phải cộng V để tổng xác suất vẫn bằng 1."],
+["2","H","Lớp 'spam' có 100 từ, từ vựng V = 50, từ 'free' xuất hiện 9 lần trong lớp spam. P('free' | spam) với làm mịn Laplace là bao nhiêu?","10/150 ≈ 0,067","9/100 = 0,09",["10/101 ≈ 0,099","9/150 = 0,06"],"(9+1)/(100+50) = 10/150."],
+["2","H","Naive Bayes là mô hình sinh (generative). Điều này có nghĩa là gì so với mô hình phân biệt (discriminative)?","NB mô hình hóa P(x, y) (qua P(x|y)P(y)) rồi suy ra P(y|x); mô hình phân biệt tính trực tiếp P(y|x)","NB tính trực tiếp P(y|x)",["NB không dùng xác suất","NB chỉ dùng được cho dữ liệu ảnh"],"Slide 'Vấn đề với NB': giả định đơn giản – tính P(x,y) thông qua…; mô hình discriminative tính trực tiếp P(y|x) (vd. logistic regression)."],
+["2","H","Ví dụ 'beautiful' và 'gorgeous' trong slide minh họa vấn đề gì của Naive Bayes?","Giả định độc lập bị vi phạm vì các từ thực tế phụ thuộc nhau","Laplace smoothing không hoạt động",["Từ vựng quá nhỏ","Prior không cân bằng"],"Hai từ đồng nghĩa thường đi cùng nhau → không độc lập, NB 'đếm trùng' bằng chứng."],
+["2","H","Kết luận của Banko & Brill (bài toán sửa lỗi chính tả) được slide nhắc đến là gì?","Khi có đủ dữ liệu huấn luyện, việc chọn bộ phân loại có thể không còn quan trọng","Naive Bayes luôn tốt nhất",["Luật thủ công tốt hơn học máy","Cần ít dữ liệu nhưng mô hình phức tạp"],"Slide 'Dữ liệu huấn luyện': với đủ dữ liệu, bộ phân loại có thể không quan trọng."],
+["2","E","Naive Bayes 'học' tham số bằng cách nào?","Đếm (ước lượng) tần suất trên dữ liệu huấn luyện","Lan truyền ngược gradient",["Tìm kiếm beam","Phân tích ma trận"],"Slide tổng kết: học = maximize P(x,y) bằng cách đếm trên dữ liệu."],
+["2","E","Ứng dụng thành công của Naive Bayes được slide nêu gồm?","Chẩn đoán sức khỏe, phân lớp văn bản, lọc thư rác","Dịch máy, sinh ảnh",["Nhận dạng giọng nói end-to-end","Tóm tắt văn bản trừu tượng"],"NB là một trong những phương pháp học máy thực tế nhất."],
+["2","E","Trong bài thực hành lọc thư rác, đơn vị nhỏ nhất khi tiền xử lý là gì?","Từ (chuỗi các từ)","Ký tự",["Câu","Đoạn văn"],"Ví dụ: 'This is a cat.' → [this, is, a, cat]."],
+["2","E","Vì sao dữ liệu thu thập từ web cần tiền xử lý?","Dữ liệu rất nhiễu: mã HTML, từ viết tắt…","Dữ liệu web luôn được gán nhãn sẵn",["Dữ liệu web không có dấu câu","Dữ liệu web quá ngắn"],"Slide: dùng biểu thức chính quy để làm sạch."],
+["2","H","Trong bài lọc thư rác, vector BoW có số chiều khoảng bao nhiêu và nên chọn thuật toán nào?","Khoảng 80.000 chiều; dùng thuật toán đơn giản hiệu quả với nhiều đặc trưng như NB, linear SVM, logistic regression","Khoảng 300 chiều; dùng k-NN",["Khoảng 768 chiều; dùng BERT","Khoảng 10 chiều; dùng cây quyết định sâu"],"Slide: chiều trong trường hợp này là 80.000; dùng NB, linear SVM hoặc logistic regression."],
+["2","E","Để cải tiến mô hình lọc thư rác, slide gợi ý hướng nào?","Feature engineering: dùng TF-IDF, n-gram","Bỏ bước tiền xử lý",["Giảm kích thước tập huấn luyện","Chỉ dùng uni-gram"],"Trích chọn đặc trưng rất quan trọng."],
+["2","H","Đặc trưng nào sau đây là đặc trưng 'thủ công' dựa trên từ điển (lexicon) theo slide?","Điểm từ SentiWordNet / MPQA","Vector Word2Vec",["Embedding BERT","Trạng thái ẩn LSTM"],"Slide: điểm từ từ điển cảm xúc (SentiWordNet, SentiWords), chủ quan/khách quan (MPQA); ngoài ra đặc trưng cú pháp (POS), thống kê (độ dài, vị trí), đặc thù bài toán (số emoji)."],
+["2","H","Vì sao trong cài đặt Naive Bayes người ta thường cộng log xác suất thay vì nhân xác suất?","Tránh tràn số dưới (underflow) khi nhân nhiều xác suất nhỏ","Để tăng độ chính xác lý thuyết",["Vì log làm mô hình phi tuyến","Để bỏ qua prior"],"log biến tích thành tổng, giữ nguyên thứ tự argmax."],
+];
+// Format: [bài, độ khó, câu hỏi, đáp án đúng, sai1, [sai2, sai3], giải thích]
+const Q_B = [
+// ================= BÀI 3 – Biểu diễn từ (Word embeddings) =================
+["3","E","Bài toán ứng dụng chính được dùng để minh họa trong Bài 3 (biểu diễn từ) là gì?","Phát hiện đạo văn","Lọc thư rác",["Nhận dạng thực thể","Dịch máy"],"Bài 3: Ứng dụng biểu diễn từ cho bài toán phát hiện đạo văn (đầu vào: văn bản + tập văn bản → độ tương tự)."],
+["3","E","Phát hiện đạo văn là bài toán khó thuộc lĩnh vực nào theo slide?","Thu hồi thông tin (information retrieval)","Thị giác máy tính",["Nhận dạng giọng nói","Học tăng cường"],"Bài toán nhỏ hơn là độ tương đồng ở mức câu."],
+["3","E","Thách thức của bài toán phát hiện đạo văn KHÔNG bao gồm điều nào sau đây?","Văn bản quá ngắn chỉ gồm một từ","Văn bản dài",["Sự đa dạng về cấu trúc và từ vựng","Cần quan tâm ngữ nghĩa và cú pháp"],"Slide nêu: văn bản dài, đa dạng cấu trúc/từ vựng, cần quan tâm semantics và syntactics."],
+["3","E","Hệ thống phát hiện đạo văn được giới thiệu trong slide là gì?","DoIT (doit.uet.vnu.edu.vn)","Turnitin",["Grammarly","Copyscape"],"Slide 7: DoIT – hệ thống của ĐH Công nghệ, ĐHQGHN."],
+["3","E","Nhược điểm chính của vector one-hot là gì?","Số chiều bằng kích thước từ vựng, thưa và mọi cặp từ đều trực giao (không thể hiện độ tương đồng)","Vector quá ngắn",["Không biểu diễn được từ thường gặp","Cần huấn luyện bằng GPU"],"Tích vô hướng giữa hai one-hot khác nhau luôn bằng 0 → 'khách sạn' và 'nhà nghỉ' không gần nhau."],
+["3","E","Mô hình CBOW (Continuous Bag-of-Words) dự đoán gì?","Từ hiện tại (từ trung tâm) dựa vào các từ ngữ cảnh","Các từ ngữ cảnh dựa vào từ trung tâm",["Câu tiếp theo","Nhãn lớp của văn bản"],"Slide: CBOW dự đoán từ hiện tại bằng ngữ cảnh, duyệt tập dữ liệu với một cửa sổ."],
+["3","E","Mô hình Skip-gram dự đoán gì?","Các từ ngữ cảnh xung quanh từ một từ trung tâm","Từ trung tâm từ các từ ngữ cảnh",["Từ bị che [MASK]","Ký tự tiếp theo"],"Skip-gram ngược với CBOW; thường tốt hơn với từ hiếm."],
+["3","E","Word2Vec (CBOW, Skip-gram) được giới thiệu trong bài báo nào?","Efficient Estimation of Word Representations in Vector Space (Mikolov và cs., 2013)","Attention is All You Need (2017)",["Deep contextualized word representations (2018)","Sequence to Sequence Learning with Neural Networks (2014)"],"Slide 15 trích dẫn bài báo 2013 của Tomas Mikolov và cs."],
+["3","H","Sau khi huấn luyện CBOW, vector biểu diễn của mỗi từ được lấy từ đâu?","Mỗi hàng của ma trận trọng số W(1) (giữa lớp vào và lớp ẩn)","Đầu ra softmax",["Ma trận đồng xuất hiện","Bias của lớp ra"],"Slide 21: mỗi hàng trong ma trận W(1) chứa giá trị (vector) của các từ."],
+["3","H","Trong CBOW, hàm nào được dùng ở lớp đầu ra để tính phân phối xác suất trên từ vựng?","Softmax","ReLU",["Sigmoid từng phần tử rồi cộng","Tanh"],"Slide 20: Mô hình CBOW – hàm softmax. Chi phí tỉ lệ với |V| nên thực tế dùng negative sampling/hierarchical softmax."],
+["3","E","Tính chất nổi bật của vector Word2Vec được slide trích dẫn là gì?","Vector từ mã hóa quan hệ ngữ nghĩa giữa các từ","Vector từ luôn trực giao",["Vector từ có số chiều bằng từ vựng","Vector từ thay đổi theo ngữ cảnh câu"],"'The word vector encodes semantic relationship among words' — ví dụ king − man + woman ≈ queen."],
+["3","E","GloVe là viết tắt của gì?","Global Vectors for Word Representation","Global Language Vector Embedding",["Generalized Logistic Vector Encoding","Gradient-based Local Vectors"],"GloVe – Stanford NLP."],
+["3","E","GloVe kết hợp hai loại thông tin nào?","Global context (thống kê đồng xuất hiện toàn tập/phân tích ma trận) và local context (cửa sổ trượt)","Ký tự và subword",["Ngữ cảnh trái và ngữ cảnh phải bằng LSTM","Ảnh và văn bản"],"Slide 23: dựa trên hai giả định global context và local context."],
+["3","E","Quá trình huấn luyện GloVe dựa trên gì?","Ma trận đồng xuất hiện và phân tích ma trận (matrix factorization)","Dự đoán từ bị che",["Mạng LSTM hai chiều","Cơ chế self-attention"],"Ý tưởng: tạo biểu diễn từ dựa trên sự đồng xuất hiện của hai từ i và j."],
+["3","H","Trong GloVe, P(k | ice) được định nghĩa là gì?","Số lần 'k' và 'ice' cùng xuất hiện chia cho số lần 'ice' xuất hiện (trong ngữ cảnh)","Số lần 'k' xuất hiện chia cho tổng số từ",["Xác suất 'ice' là từ tiếp theo của 'k'","Cosine giữa vector k và ice"],"Pij = P(j|i) = Xij / Xi."],
+["3","H","Trong ví dụ GloVe, với k = 'solid', tỉ lệ P(k|ice) / P(k|steam) sẽ như thế nào?","Lớn hơn 1 (rất lớn)","Rất nhỏ (gần 0)",["Xấp xỉ 1","Âm"],"'solid' gần với 'ice' hơn 'steam' → tỉ lệ lớn. 'gas' → rất nhỏ; 'water'/'fashion' → gần 1."],
+["3","H","Trong ví dụ GloVe, với k = 'water' (liên quan đến cả ice và steam), tỉ lệ P(k|ice)/P(k|steam) xấp xỉ bao nhiêu?","Gần 1","Rất lớn",["Rất nhỏ","Bằng 0"],"Từ giống hoặc khác cả hai từ → tỉ lệ gần 1, không mang thông tin phân biệt."],
+["3","H","Trong ký hiệu GloVe, Xij là gì?","Số lần từ j xuất hiện trong ngữ cảnh của từ i","Tích vô hướng giữa vector i và j",["Xác suất từ i theo sau từ j","Khoảng cách giữa vị trí i và j"],"Xi = Σk Xik là số lần bất kỳ từ nào xuất hiện trong ngữ cảnh từ i."],
+["3","H","Vì sao không thể dùng trực tiếp F(i, j, k) = P_ik / P_jk làm hàm mục tiêu trong GloVe?","Vector từ nhiều chiều nhưng tỉ lệ là vô hướng, và hàm 3 thành phần (3 từ) không phù hợp nên cần giảm còn 2","Vì tỉ lệ luôn bằng 1",["Vì P_ik không tính được","Vì cần dữ liệu gán nhãn"],"Slide 26: các vấn đề tính toán dẫn tới dùng hiệu vector, tích vô hướng, hàm exp/log và hai bias."],
+["3","H","Khi xây dựng hàm chi phí GloVe, hàm nào được dùng để biến đổi (do ràng buộc đồng hình – homomorphism)?","Hàm mũ exp (ngược lại là log), sau đó thêm hai bias","Hàm sigmoid",["Hàm ReLU","Hàm softmax trên toàn từ vựng"],"Kết quả: wiᵀw̃k + bi + b̃k ≈ log Xik, kèm hàm trọng số f(Xij) (hàm chi phí trọng số)."],
+["3","H","Hàm chi phí của GloVe có dạng nào?","Bình phương sai số có trọng số: Σ f(Xij)(wiᵀw̃j + bi + b̃j − log Xij)²","Cross-entropy trên softmax toàn từ vựng",["Negative log-likelihood của câu","Hinge loss"],"Hàm trọng số f giảm ảnh hưởng của cặp quá hiếm và giới hạn cặp quá phổ biến."],
+["3","E","Ưu điểm của GloVe theo slide là gì?","Huấn luyện nhanh do chỉ dùng phân tích ma trận; ổn định trên tập lớn; tốt cả với dữ liệu và vector nhỏ","Tốn ít bộ nhớ",["Biểu diễn phụ thuộc ngữ cảnh","Xử lý tốt từ hiếm nhờ ký tự"],"Ngoài ra có thể dừng sớm (early stopping)."],
+["3","E","Nhược điểm của GloVe theo slide là gì?","Tốn bộ nhớ do phải lưu ma trận X; có thể bị ảnh hưởng bởi khởi tạo learning rate","Huấn luyện chậm",["Không dùng được cho tiếng Anh","Không biểu diễn được ngữ nghĩa"],"Slide 33."],
+["3","E","FastText được phát triển bởi tổ chức nào?","Facebook","Google",["Stanford","OpenAI"],"FastText mở rộng từ Word2Vec, hỗ trợ nhiều ngôn ngữ."],
+["3","E","Ý tưởng chính của FastText là gì?","Biểu diễn từ bằng các n-gram ký tự (sub-word)","Dùng LSTM hai chiều",["Dùng phân tích ma trận đồng xuất hiện","Dùng self-attention"],"Ví dụ 'difference' được huấn luyện bởi 'di', 'dif', 'diff', …"],
+["3","E","FastText cho kết quả tốt với loại từ nào?","Từ hiếm (rare words) và có thể suy ra vector cho từ mới","Chỉ từ phổ biến",["Chỉ stopwords","Chỉ danh từ riêng"],"Nhờ dùng sub-word nên chia sẻ thông tin hình thái (tiền tố, hậu tố)."],
+["3","H","Vector của một từ trong FastText được tạo như thế nào?","Tổng (sum) các vector n-gram ký tự của từ đó (cùng với vector từ)","Trung bình các vector câu chứa từ",["Trạng thái ẩn cuối của LSTM","Hàng tương ứng trong ma trận đồng xuất hiện"],"Slide 35: mô hình giống skip-gram nhưng thêm phần n-grams, cộng lại (sum)."],
+["3","H","FastText dựa trên kiến trúc Word2Vec nào?","Skip-gram (thêm n-gram ký tự)","CBOW thuần",["GloVe","ELMo"],"Slide 35: sử dụng mô hình giống skip-gram của word2vec, nhưng thêm phần n-grams."],
+["3","H","Vì sao FastText có thể suy ra vector cho từ chưa gặp (OOV) như 'dioxide'?","Vì từ mới vẫn được phân rã thành các n-gram ký tự đã học","Vì FastText tra từ điển ngoài",["Vì FastText dùng ngữ cảnh câu","Vì FastText dùng one-hot"],"Slide 35: 'Can infer new words'."],
+["3","E","Nhược điểm của FastText theo slide là gì?","Tốn nhiều bộ nhớ do phải lưu trữ trên ký tự (n-gram)","Không biểu diễn được từ hiếm",["Không hỗ trợ nhiều ngôn ngữ","Huấn luyện bằng phân tích ma trận"],"Slide 36."],
+["3","E","ELMo là viết tắt của gì?","Embeddings from Language Models","Efficient Language Model",["Encoder Layer Model","Extended Long Memory"],"ELMo – Peters và cs., 2018 (NAACL 2018 best paper)."],
+["3","E","Ưu điểm nổi bật của ELMo so với Word2Vec và GloVe là gì?","Biểu diễn phụ thuộc ngữ cảnh: cùng một từ có vector khác nhau trong các câu khác nhau","Tốn ít bộ nhớ hơn",["Huấn luyện bằng phân tích ma trận","Vector có số chiều nhỏ hơn"],"Ví dụ 'read' trong 'I read the book yesterday' và 'Can you read the letter now?'."],
+["3","H","Kiến trúc của ELMo gồm những thành phần nào?","CNN mức ký tự để tạo raw word vector + 2 tầng biLM (LSTM hai chiều)","Transformer encoder 12 tầng",["Một tầng CBOW + softmax","Ma trận đồng xuất hiện + SVD"],"Slide 39: character-level CNN, hai tầng biLM."],
+["3","H","Biểu diễn cuối cùng của một từ trong ELMo là gì?","Tổ hợp có trọng số của biểu diễn từ ban đầu và vector của 2 tầng biLM","Chỉ trạng thái ẩn tầng biLM cuối",["Trung bình các n-gram ký tự","Hàng của ma trận W(1)"],"Trọng số kết hợp được học theo từng bài toán downstream."],
+["3","H","Vì sao ELMo xử lý tốt từ hiếm?","Vì biểu diễn đầu vào dựa trên ký tự (char-CNN)","Vì dùng từ điển đồng nghĩa",["Vì dùng ma trận đồng xuất hiện","Vì loại bỏ từ hiếm"],"Slide 40: xử lý tốt vấn đề từ hiếm do biểu diễn trên ký tự."],
+["3","H","Trong biLM của ELMo, vector tầng giữa (intermediate word vectors) được tạo ra như thế nào?","Kết hợp theo chiều tiến và chiều lùi của một từ","Lấy trung bình embedding ký tự",["Nhân ma trận đồng xuất hiện","Từ cơ chế cross-attention"],"Tầng biLM thứ 2 dùng vector tầng giữa làm đầu vào."],
+["3","E","Các bước xây dựng mô hình biểu diễn từ theo slide là gì?","Thu thập dữ liệu đủ lớn (Wikipedia) → chọn mô hình phù hợp → huấn luyện (thường cần GPU) → áp dụng vào bài toán","Gán nhãn thủ công từng từ → huấn luyện SVM",["Chọn mô hình → bỏ qua dữ liệu → triển khai","Chỉ cần tải về từ điển"],"Slide 42."],
+["3","H","Phương pháp biểu diễn nào sau đây là biểu diễn TĨNH (mỗi từ chỉ có một vector bất kể ngữ cảnh)?","Word2Vec, GloVe, FastText","ELMo",["BERT","Trạng thái ẩn của Bi-LSTM"],"ELMo, BERT tạo biểu diễn ngữ cảnh (contextual)."],
+["3","H","Để đo độ tương tự giữa hai văn bản bằng word embedding trong phát hiện đạo văn, cách đơn giản và phổ biến là gì?","Lấy trung bình (hoặc tổng có trọng số) vector các từ thành vector văn bản rồi tính cosine similarity","Đếm số ký tự giống nhau",["So sánh độ dài hai văn bản","Tính BLEU giữa hai vector"],"Cosine = A·B / (‖A‖‖B‖); có thể kết hợp TF-IDF làm trọng số."],
+["3","H","Phát biểu nào đúng về ma trận đồng xuất hiện dùng cửa sổ trượt (slide 12)?","Giá trị tại một ô là số lần từ ở hàng đồng xuất hiện với từ ở cột trong cửa sổ","Giá trị tại ô là TF-IDF của từ",["Ma trận luôn có kích thước 300×300","Ma trận không đối xứng khi cửa sổ đối xứng"],"Với cửa sổ đối xứng, ma trận đồng xuất hiện là đối xứng."],
+
+// ================= BÀI 4 – RNN, LSTM, NER =================
+["4","E","Ưu điểm cấu trúc của RNN so với mạng truyền thẳng là gì?","Phù hợp với dữ liệu chuỗi/thời gian nhờ trạng thái ẩn truyền qua các bước","Không cần huấn luyện",["Luôn nhớ được phụ thuộc xa","Song song hóa hoàn toàn theo thời gian"],"Slide: cấu trúc RNN rất phù hợp với chuỗi thời gian."],
+["4","E","Vấn đề chính của RNN thuần (vanilla) là gì?","Khó học phụ thuộc xa, dễ 'quên thông tin cũ' do vanishing gradient","Không xử lý được chuỗi ngắn",["Quá ít tham số","Không dùng được hàm kích hoạt"],"Mong muốn: RNN có khả năng 'nhớ' → LSTM."],
+["4","H","Vì sao gradient ∂ht/∂x0 trong RNN có thể tiến về 0?","Vì nó là tích của nhiều đạo hàm ∂hk/∂hk−1; nếu mỗi thừa số nhỏ hơn 1 thì tích giảm theo hàm mũ","Vì learning rate quá lớn",["Vì dùng softmax ở đầu ra","Vì từ vựng quá lớn"],"Chuỗi quy tắc: ∂ht/∂x0 = ∂ht/∂ht−1 · ∂ht−1/∂ht−2 ⋯ ∂h0/∂x0 – phụ thuộc vào hàm kích hoạt."],
+["4","E","Giải pháp 'thay đổi hàm kích hoạt' cho vanishing gradient có hạn chế gì theo slide?","Vấn đề giảm nhưng không giải quyết hoàn toàn, có thể ảnh hưởng hiệu năng học","Giải quyết hoàn toàn vấn đề",["Làm mô hình không huấn luyện được","Chỉ dùng được cho CNN"],"Giải pháp tốt hơn: LSTM."],
+["4","E","LSTM là viết tắt của gì?","Long Short-Term Memory","Linear Sequential Time Model",["Large Scale Text Model","Long Sentence Transformer Memory"],"LSTM – Hochreiter & Schmidhuber (1997)."],
+["4","E","Ý tưởng chính của LSTM là gì?","Dùng một đường truyền trực tiếp (trạng thái tế bào – cell state) từ đầu vào phía trước đến đầu ra hiện tại","Bỏ hoàn toàn trạng thái ẩn",["Dùng attention thay cho hồi quy","Dùng tích chập theo thời gian"],"Slide 12: đường trực tiếp giúp gradient lan truyền xa hơn."],
+["4","E","Một nơ-ron LSTM có những cổng nào?","Cổng vào (input), cổng quên (forget), cổng ra (output)","Cổng reset và cổng update",["Cổng query, key, value","Cổng encoder và decoder"],"Cổng reset/update là của GRU."],
+["4","E","Các cổng trong LSTM sử dụng hàm kích hoạt nào và có giá trị đầu ra trong khoảng nào?","Sigmoid σ, giá trị trong [0, 1]","Tanh, giá trị trong [−1, 1]",["ReLU, giá trị trong [0, ∞)","Softmax, tổng bằng 1"],"Giá trị cổng nhân từng phần tử (pointwise) như một 'bộ lọc' điều khiển luồng thông tin."],
+["4","H","Phép toán nào được cổng LSTM dùng để điều khiển luồng thông tin?","Nhân từng phần tử (pointwise / Hadamard) với vector cổng","Nhân ma trận với cổng",["Cộng bias","Lấy max"],"Cổng ≈ 0: chặn thông tin; ≈ 1: cho đi qua."],
+["4","H","Trong LSTM, vai trò của cổng vào i_t và giá trị ứng viên C̃_t là gì?","i_t quyết định thành phần nào được cập nhật; C̃_t cung cấp nội dung thay đổi","i_t xóa bộ nhớ cũ; C̃_t là đầu ra",["i_t quyết định đầu ra; C̃_t là trạng thái ẩn","Cả hai đều quyết định thông tin bị quên"],"Slide 15, bước (2)."],
+["4","H","Công thức cập nhật trạng thái tế bào LSTM là gì?","C_t = f_t ⊙ C_{t−1} + i_t ⊙ C̃_t","C_t = o_t ⊙ tanh(C_{t−1})",["C_t = f_t + i_t + C̃_t","C_t = σ(W·[h_{t−1}, x_t])"],"Cổng quên giữ lại phần bộ nhớ cũ, cổng vào thêm nội dung mới."],
+["4","H","Trạng thái ẩn đầu ra h_t của LSTM được tính như thế nào?","h_t = o_t ⊙ tanh(C_t)","h_t = f_t ⊙ C_t",["h_t = i_t ⊙ C̃_t","h_t = C_t"],"Cổng ra quyết định thành phần nào của trạng thái tế bào sinh đầu ra (bước 4)."],
+["4","H","Vì sao phép cộng trong cập nhật cell state giúp LSTM giảm vanishing gradient?","Gradient đi qua C_t = f_t⊙C_{t−1}+… chỉ nhân với f_t (có thể ≈1), không phải nhân lặp lại với ma trận trọng số và đạo hàm hàm kích hoạt","Vì LSTM không dùng lan truyền ngược",["Vì LSTM có ít tham số hơn RNN","Vì LSTM dùng ReLU"],"Đường 'cao tốc' tuyến tính cho gradient – tương tự ý tưởng residual connection."],
+["4","E","GRU (Gated Recurrent Unit) khác LSTM ở điểm nào?","GRU có 2 cổng (update, reset) và không tách riêng cell state, nên ít tham số hơn","GRU có 4 cổng",["GRU không có cổng nào","GRU chỉ dùng cho ảnh"],"GRU là biến thể gọn nhẹ của LSTM (đề cương mục 4.3)."],
+["4","E","Mô hình ngôn ngữ (language model) tính gì?","Xác suất P(W) của một câu hoặc P(wn | w1, …, wn−1)","Nhãn từ loại của mỗi từ",["Độ dài câu","Vector one-hot của câu"],"Ví dụ P('con mèo nhảy qua con chó') ≈ cao, P('qua con mèo con chó nhảy') ≈ thấp."],
+["4","E","Ví dụ P('high winds tonight') > P('large winds tonight') minh họa ứng dụng nào của mô hình ngôn ngữ?","Dịch máy","Nhận dạng giọng nói",["Sửa lỗi chính tả","Phân loại quan điểm"],"Slide 18."],
+["4","E","Ví dụ 'fifteen minuets' → 'fifteen minutes' minh họa ứng dụng nào của mô hình ngôn ngữ?","Sửa lỗi văn bản (chính tả)","Dịch máy",["Nhận dạng giọng nói","Tóm tắt"],"P('about fifteen minutes from') > P('about fifteen minuets from')."],
+["4","E","Ví dụ P('I saw a van') > P('eyes awe of an') minh họa ứng dụng nào?","Nhận dạng giọng nói","Sửa lỗi chính tả",["Dịch máy","NER"],"Hai chuỗi phát âm tương tự, LM chọn chuỗi hợp lý hơn."],
+["4","E","Trong dịch máy với LSTM, ta ước lượng xác suất nào?","P(e | f): câu đích e với điều kiện câu nguồn f","P(f) của câu nguồn",["P(e) không điều kiện","P(f | e) bằng đếm"],"Mô hình seq2seq gồm encoder và decoder."],
+["4","E","Mô hình sequence-to-sequence gồm những thành phần nào?","Encoder (mã hóa câu nguồn thành vector) và Decoder (mô hình ngôn ngữ sinh câu đích có điều kiện)","Hai bộ phân lớp Naive Bayes",["Một CNN và một SVM","Chỉ một RNN duy nhất"],"Encoder cung cấp trạng thái khởi tạo cho decoder."],
+["4","E","Giải mã tham lam (greedy decoding) có vấn đề gì?","Không thể quay lại sửa quyết định ở các bước trước","Quá chậm",["Luôn sinh câu quá ngắn","Không dùng được softmax"],"Ví dụ: the → the poor → the poor are … (sai, đúng là 'don't')."],
+["4","E","Beam search lưu bao nhiêu giả thuyết tại mỗi bước?","k giả thuyết tốt nhất (beam size), thường k khoảng 5–10","Chỉ 1",["Toàn bộ V^T giả thuyết","2 giả thuyết cố định"],"Slide 25."],
+["4","E","Trong phân loại quan điểm với LSTM (một chiều), đặc trưng cho bộ phân lớp thường lấy từ đâu?","Đầu ra (trạng thái ẩn) của từ cuối cùng h_n","Đầu ra của từ đầu tiên",["Embedding của từ dài nhất","Tổng các vector one-hot"],"Slide 28: các h1, h2… bị bỏ qua, chỉ dùng hn."],
+["4","H","Trong phân loại quan điểm với Bi-LSTM theo slide 29, đặc trưng được tính thế nào?","Kết hợp (tổng – Sum) đầu ra tại mọi từ rồi đưa vào bộ phân lớp tuyến tính","Chỉ dùng đầu ra từ đầu tiên",["Nối các vector one-hot","Lấy embedding của từ cuối"],"h = Sum(h1, …, hn) → Linear Classifier."],
+["4","E","Gán nhãn từ loại (POS tagging) là gì?","Gán cho mỗi từ trong câu một nhãn từ loại (NNP, VBD, DT, NN…)","Gán một nhãn cho cả câu",["Dịch từng từ","Tách câu thành từ"],"Ví dụ 'John saw the saw…': saw (VBD) và saw (NN) khác nhãn."],
+["4","H","Trong câu 'John saw the saw and decided to take it to the table', hai từ 'saw' được gán nhãn như thế nào?","saw thứ nhất VBD (động từ quá khứ), saw thứ hai NN (danh từ)","Cả hai đều là NN",["Cả hai đều là VBD","saw thứ nhất NN, saw thứ hai VBD"],"Minh họa POS tagging giúp phân biệt nghĩa của từ."],
+["4","E","Bài toán nào sau đây KHÔNG phải bài toán gán nhãn chuỗi được nêu trong slide?","Lọc thư rác","Gán nhãn từ loại",["Nhận dạng thực thể","Gán nhãn vai trò ngữ nghĩa (SRL)"],"Lọc thư rác gán một nhãn cho cả văn bản (phân lớp văn bản)."],
+["4","H","Semantic Role Labeling (gán nhãn vai trò ngữ nghĩa) là gì?","Xác định vai trò ngữ nghĩa của mỗi cụm danh từ so với động từ trong câu","Xác định từ loại",["Xác định thực thể có tên","Phân loại cảm xúc câu"],"Slide 33; ngoài NLP, gán nhãn chuỗi còn dùng cho chuỗi gen."],
+["4","E","Các nhóm thực thể chính trong NER là gì?","Người (PER), Vị trí/Địa điểm (LOC), Tổ chức (ORG)","Danh từ, động từ, tính từ",["Tích cực, tiêu cực, trung tính","Spam, ham"],"Mở rộng: ngày tháng, email, độ đo; lĩnh vực khác: tên thuốc, gen…"],
+["4","E","Ứng dụng của NER theo slide gồm?","Dịch máy, hỏi–đáp, truy vấn thông tin, tổng hợp giọng nói","Nén ảnh",["Lọc nhiễu âm thanh","Sinh ảnh từ văn bản"],"Slide 38."],
+["4","H","Ví dụ 'May' và 'Washington' minh họa khó khăn nào của NER?","Nhập nhằng kiểu thực thể (May: người hay tháng; Washington: người hay địa điểm)","Thực thể quá dài",["Thiếu dữ liệu tiếng Anh","Lỗi chính tả"],"Thêm nữa: nhiều dạng của cùng thực thể (John Smith, Mr Smith, John), nhập nhằng với từ thường ('may')."],
+["4","E","Trong cách tiếp cận học máy cho NER, các từ không thuộc thực thể nào được gán nhãn gì?","O (Other/Outside)","PER",["UNK","[MASK]"],"Mỗi từ được gán lớp thực thể của nó hoặc O."],
+["4","H","Trong lược đồ gán nhãn BIO cho 'John Smith lives in New York', nhãn đúng là gì?","B-PER I-PER O O B-LOC I-LOC","B-PER B-PER O O B-LOC B-LOC",["I-PER I-PER O O I-LOC I-LOC","PER PER O O LOC LOC O"],"B = Begin, I = Inside, O = Outside (ví dụ CoNLL 2003 trong slide BERT)."],
+["4","H","Vì sao Bi-LSTM thường tốt hơn LSTM một chiều cho NER?","Nhãn của một từ phụ thuộc cả ngữ cảnh bên trái và bên phải","Bi-LSTM có ít tham số hơn",["Bi-LSTM không bị vanishing gradient","Bi-LSTM sinh câu nhanh hơn"],"Ví dụ: 'Washington' là người hay địa danh thường được quyết định bởi các từ phía sau."],
+["4","H","Bi-LSTM tạo biểu diễn cho mỗi token như thế nào?","Nối (concat) trạng thái ẩn của LSTM chiều xuôi và LSTM chiều ngược tại vị trí đó","Cộng embedding của token với vị trí",["Lấy trung bình mọi trạng thái ẩn","Chỉ dùng LSTM chiều ngược"],"Thường thêm một lớp phân lớp (softmax/CRF) phía trên để gán nhãn."],
+["4","H","Khi dùng LSTM cho mô hình ngôn ngữ, đầu ra tại bước t được dùng để làm gì?","Dự đoán phân phối xác suất (softmax) của từ tiếp theo w_{t+1}","Dự đoán nhãn của cả câu",["Dự đoán từ ở bước t−1","Tính TF-IDF"],"Xác suất câu = tích các xác suất từ tiếp theo."],
+];
+// Format: [bài, độ khó, câu hỏi, đáp án đúng, sai1, [sai2, sai3], giải thích]
+const Q_C = [
+// ================= BÀI 5 – Seq2Seq & Attention =================
+["5","E","Đầu vào và đầu ra của bài toán dịch máy (MT) là gì?","Câu x ở ngôn ngữ nguồn → câu y ở ngôn ngữ đích","Một văn bản → một nhãn lớp",["Một câu → cây cú pháp","Một ảnh → một chú thích"],"Ví dụ: 'L'homme est né libre…' → 'Man is born free…'."],
+["5","E","Dịch máy mạng nơ-ron (NMT) là gì?","Phương pháp dịch máy sử dụng một mạng nơ-ron (kiến trúc seq2seq, thường gồm 2 RNN)","Dịch máy dựa trên luật",["Dịch máy thống kê dựa trên cụm từ","Dịch máy dựa trên từ điển song ngữ"],"Slide 4."],
+["5","E","Bài báo giới thiệu mô hình encoder–decoder cho dịch máy (2014) là gì?","Sequence to Sequence Learning with Neural Networks","Attention is All You Need",["BERT: Pre-training of Deep Bidirectional Transformers","Efficient Estimation of Word Representations"],"Sutskever, Vinyals, Le – 2014."],
+["5","E","Trong seq2seq cơ bản, toàn bộ câu nguồn được tổng hợp vào đâu?","Một vector duy nhất (vector ngữ cảnh K chiều – trạng thái ẩn cuối của encoder)","Ma trận đồng xuất hiện",["Một tập k giả thuyết","Bảng tra cứu cụm từ"],"Đây là nguyên nhân của vấn đề nút cổ chai thông tin."],
+["5","H","Trong seq2seq (không attention), trạng thái của bộ giải mã tại bước t phụ thuộc vào gì?","Trạng thái trước đó và đầu ra trước đó (vector ngữ cảnh chỉ đưa vào làm trạng thái khởi tạo/điều kiện)","Toàn bộ trạng thái ẩn của encoder tại mọi bước",["Chỉ từ đầu tiên của câu nguồn","Chỉ vị trí t"],"Slide 8."],
+["5","E","Decoder RNN trong seq2seq đóng vai trò gì?","Một mô hình ngôn ngữ sinh câu đích có điều kiện trên encoding của câu nguồn","Bộ phân lớp câu nguồn",["Bộ tách từ","Bộ tính BLEU"],"Conditional language model."],
+["5","H","Tại thời điểm TEST, đầu vào của decoder ở bước t+1 là gì?","Từ mà decoder vừa sinh ra (argmax/beam) ở bước t","Từ đúng trong câu tham chiếu",["Từ tương ứng trong câu nguồn","Token <START> ở mọi bước"],"Slide 9: đầu ra của decoder được cung cấp như đầu vào của bước tiếp theo."],
+["5","H","Khi HUẤN LUYỆN seq2seq như slide 13, đầu vào của decoder tại mỗi bước là gì?","Từ đúng của câu đích ở bước trước (teacher forcing): <START> the poor don't …","Từ decoder tự dự đoán",["Câu nguồn đảo ngược","Vector ngẫu nhiên"],"Đây là sự khác biệt giữa train và test (exposure bias)."],
+["5","E","Hàm mất mát khi huấn luyện NMT là gì?","Tổng (trung bình) negative log-probability của từ đúng tại mỗi bước giải mã","Bình phương sai số giữa hai câu",["Hinge loss","BLEU âm"],"J = (1/T) Σ J_t, J_t = −log P(y_t đúng)."],
+["5","E","Seq2seq được tối ưu như thế nào?","Như một hệ thống duy nhất, lan truyền ngược đầu–cuối (end-to-end)","Tối ưu riêng từng thành phần",["Encoder huấn luyện trước, decoder cố định","Bằng đếm tần suất"],"Slide 13."],
+["5","H","Nếu liệt kê toàn bộ câu đích có thể để tìm y tối ưu, độ phức tạp là bao nhiêu (V: từ vựng, T: độ dài câu đích)?","O(V^T)","O(V·T)",["O(T^V)","O(k·V)"],"Quá lớn → dùng beam search."],
+["5","E","Phát biểu nào đúng về beam search?","Không đảm bảo tìm được lời giải tối ưu nhưng hiệu quả hơn nhiều so với tìm kiếm vét cạn","Luôn tìm được lời giải tối ưu",["Chậm hơn tìm kiếm vét cạn","Chỉ giữ 1 giả thuyết mỗi bước"],"Slide 16."],
+["5","E","Beam size k thực tế thường là bao nhiêu?","Khoảng 5 đến 10","1",["100 đến 1000","Bằng kích thước từ vựng"],"k = 1 tương đương giải mã tham lam."],
+["5","H","Beam search với k = 1 tương đương với phương pháp nào?","Giải mã tham lam (greedy decoding)","Tìm kiếm vét cạn",["Lấy mẫu ngẫu nhiên","Teacher forcing"],"Chỉ giữ một giả thuyết tốt nhất tại mỗi bước."],
+["5","H","Điểm (score) của một giả thuyết y1…yt trong beam search được tính thế nào?","Tổng log-xác suất: Σ log P(yi | y<i, x)","Tích các BLEU",["Số từ trong giả thuyết","Xác suất của từ cuối cùng"],"Điểm luôn âm và giảm khi câu dài thêm."],
+["5","E","Trong beam search, khi một giả thuyết sinh ra token <END> thì sao?","Giả thuyết đó hoàn thành, được đặt sang một bên và tiếp tục khám phá các giả thuyết khác","Dừng toàn bộ quá trình tìm kiếm",["Loại bỏ giả thuyết đó","Khởi động lại beam"],"Slide 25."],
+["5","H","Tiêu chí dừng beam search thường là gì?","Đạt bước thời gian T (ngưỡng định trước) hoặc có ít nhất n giả thuyết đã hoàn thành","Khi gặp <END> đầu tiên",["Sau đúng 5 bước","Khi BLEU đạt 100"],"Cả T và n đều là ngưỡng xác định trước."],
+["5","H","Vấn đề khi chọn câu tốt nhất bằng tổng log-xác suất là gì và cách khắc phục?","Câu dài có điểm thấp hơn → chuẩn hóa theo độ dài (chia cho t)","Câu ngắn có điểm thấp → nhân với độ dài",["Câu dài luôn tốt hơn → không cần xử lý","Điểm có thể dương → lấy trị tuyệt đối"],"Score chuẩn hóa: (1/t) Σ log P(yi | …)."],
+["5","E","Ưu điểm của NMT so với dịch máy thống kê (SMT) KHÔNG bao gồm điều nào?","Dễ giải thích và dễ gỡ lỗi","Bản dịch trôi chảy hơn, dùng ngữ cảnh tốt hơn",["Tối ưu đầu–cuối một mạng duy nhất","Ít công sức con người, không cần trích xuất đặc trưng"],"Khó giải thích, khó gỡ lỗi là NHƯỢC điểm của NMT."],
+["5","E","Nhược điểm của NMT so với SMT là gì?","Khó giải thích, khó gỡ lỗi, khó kiểm soát (không dễ đưa vào luật/hướng dẫn dịch), lo ngại an toàn","Chất lượng dịch thấp hơn",["Cần nhiều kỹ sư trích xuất đặc trưng","Phải xây dựng riêng cho từng cặp ngôn ngữ"],"Slide 28."],
+["5","E","BLEU là viết tắt của gì?","Bilingual Evaluation Understudy","Basic Language Evaluation Unit",["Bidirectional Language Encoder Understanding","Best Likelihood Estimation Under"],"Độ đo đánh giá chất lượng dịch máy."],
+["5","H","BLEU tính độ tương tự dựa trên những thành phần nào?","Độ chính xác n-gram (thường đến 3- hoặc 4-gram) và hàm phạt câu dịch quá ngắn (brevity penalty)","Khoảng cách cosine giữa embedding",["Độ dài câu và số dấu câu","Xác suất của mô hình ngôn ngữ"],"Slide 29."],
+["5","H","Vì sao BLEU là độ đo 'tốt nhưng không hoàn hảo'?","Một bản dịch tốt có thể có BLEU thấp vì trùng lặp n-gram thấp với bản dịch của người","BLEU không tính được cho tiếng Anh",["BLEU luôn bằng 1","BLEU cần huấn luyện mô hình"],"Có nhiều cách dịch đúng cho cùng một câu."],
+["5","E","Vấn đề 'nút cổ chai' (bottleneck) của seq2seq là gì?","Vector mã hóa cuối của encoder phải nắm tất cả thông tin của câu nguồn","Decoder quá chậm",["Từ vựng quá lớn","Beam size quá nhỏ"],"Thắt cổ chai thông tin, đặc biệt với câu dài."],
+["5","E","Ý tưởng chính của cơ chế attention trong seq2seq là gì?","Tại mỗi bước giải mã, decoder tập trung vào một phần cụ thể của câu nguồn","Dùng nhiều encoder song song",["Bỏ hoàn toàn decoder","Tăng kích thước vector ngữ cảnh"],"Slide 32."],
+["5","E","Trong slide, điểm attention (attention score) giữa decoder và encoder được tính bằng phép toán nào?","Tích vô hướng (dot product) giữa trạng thái ẩn decoder và từng trạng thái ẩn encoder","Khoảng cách Euclid",["Cosine của embedding đầu vào","Đếm đồng xuất hiện"],"e_t = [s_tᵀh_1, …, s_tᵀh_N]."],
+["5","E","Sau khi có các attention score, bước tiếp theo là gì?","Áp dụng softmax để chuyển thành phân phối xác suất (attention distribution)","Lấy argmax",["Nhân với BLEU","Áp dụng ReLU"],"Slide 37."],
+["5","E","Đầu ra attention (context vector) được tính như thế nào?","Tổng có trọng số các trạng thái ẩn encoder, trọng số là phân phối attention","Trạng thái ẩn cuối của encoder",["Trung bình các embedding đầu vào","Tích các trạng thái ẩn"],"a_t = Σ α_i^t h_i."],
+["5","H","Đầu ra attention a_t được sử dụng thế nào để sinh từ ở bước t?","Nối (concatenate) a_t với trạng thái ẩn decoder s_t rồi tính đầu ra như seq2seq thường","Thay thế hoàn toàn trạng thái ẩn decoder",["Cộng vào embedding câu nguồn","Bỏ qua và chỉ dùng s_t"],"[a_t; s_t] → lớp đầu ra → softmax."],
+["5","H","Thứ tự đúng các bước tính attention trong seq2seq là gì?","Score (dot product) → softmax → tổng có trọng số → nối với trạng thái decoder","Softmax → score → nối → tổng có trọng số",["Tổng có trọng số → score → softmax","Nối → softmax → score"],"Slide 45: Attention – công thức."],
+["5","E","Lợi ích của attention được slide nêu KHÔNG bao gồm điều nào?","Loại bỏ hoàn toàn nhu cầu dữ liệu huấn luyện","Cải thiện đáng kể hiệu năng NMT",["Giải quyết vấn đề nút cổ chai","Cung cấp khả năng diễn giải (alignment)"],"Attention còn giúp giảm vanishing gradient (đường tắt tới trạng thái xa)."],
+["5","H","Vì sao attention giúp giảm vanishing gradient?","Tạo đường tắt (shortcut) trực tiếp từ decoder tới mọi trạng thái encoder","Vì dùng hàm ReLU",["Vì giảm số tham số","Vì loại bỏ softmax"],"Gradient không phải đi qua chuỗi dài các bước hồi quy."],
+["5","H","Khả năng diễn giải (interpretability) của attention thể hiện ở đâu?","Phân phối attention cho thấy decoder 'căn chỉnh' (alignment) từ đích với từ nguồn nào, dù không được huấn luyện căn chỉnh trực tiếp","Attention sinh ra cây cú pháp",["Attention in ra luật dịch","Attention tính BLEU"],"Ma trận attention có thể trực quan hóa như bảng alignment."],
+["5","E","Google Translate chuyển từ SMT sang NMT vào năm nào?","2016","2010",["2014","2020"],"2014: bài báo seq2seq; 2016: Google Translate chuyển sang NMT."],
+["5","E","Những khó khăn còn tồn tại của dịch máy KHÔNG bao gồm?","Không thể dịch câu ngắn","Từ ngoài từ điển (OOV)",["Khác lĩnh vực giữa dữ liệu huấn luyện và kiểm tra","Cặp ngôn ngữ ít dữ liệu, duy trì ngữ cảnh văn bản dài"],"Ngoài ra: dùng common sense vẫn khó; hệ thống khó giải thích có thể làm điều lạ."],
+["5","E","Bài toán nào sau đây có thể dùng seq2seq theo slide?","Tóm tắt văn bản, hội thoại, phân tích cú pháp, sinh mã nguồn","Chỉ dịch máy",["Chỉ phân loại ảnh","Chỉ đếm từ"],"Tóm tắt (dài → ngắn), hội thoại (câu trước → câu sau), parsing, NL → Python."],
+["5","H","Trong cross-attention của seq2seq, nếu dùng thuật ngữ Q/K/V thì query, key, value lần lượt là gì?","Query: trạng thái decoder; Key và Value: các trạng thái ẩn encoder","Query: trạng thái encoder; Key: decoder; Value: embedding",["Cả ba đều là trạng thái decoder","Query: embedding đầu vào; Key: vị trí; Value: nhãn"],"Bài 6.1: 'Use query vector (decoder state) and key vectors (all encoder states)'."],
+["5","H","Câu 'les pauvres sont démunis' được dùng xuyên suốt trong slide; bản dịch đúng là gì và greedy sai ở đâu?","'the poor don't have any money'; greedy có thể chọn 'are' sau 'the poor' và không quay lại được","'the poor are rich'; greedy sai ở từ đầu",["'poor people sleep'; greedy sai ở từ cuối","'the poor have money'; greedy luôn đúng"],"Minh họa cho nhu cầu beam search."],
+["5","H","Với beam size k và từ vựng V, mỗi bước beam search cần xét bao nhiêu ứng viên trước khi giữ lại k?","k × V (mỗi giả thuyết được mở rộng với mọi từ trong từ vựng)","V^T",["k","V / k"],"Sau đó chỉ giữ k giả thuyết có điểm cao nhất. (Thực tế có thể lấy top-k của mỗi giả thuyết trước → k² ứng viên.)"],
+["5","H","So với seq2seq không attention, seq2seq có attention cải thiện rõ nhất với loại câu nào?","Câu dài, vì không còn phải nén toàn bộ thông tin vào một vector cố định","Câu chỉ có một từ",["Câu không có động từ","Câu có nhiều dấu câu"],"Hiệu năng seq2seq cũ giảm mạnh khi câu nguồn dài."],
+
+// ================= BÀI 6.1 – Transformer =================
+["6.1","E","Cross attention (Bahdanau và cs., 2015) là gì?","Mỗi phần tử trong một chuỗi chú ý tới các phần tử của một chuỗi KHÁC","Mỗi phần tử chú ý tới các phần tử của chính chuỗi đó",["Chú ý chỉ tới phần tử phía trước","Chú ý tới vị trí tuyệt đối"],"Ví dụ: từ tiếng Anh chú ý tới từ tiếng Nhật 'kore wa rei desu'."],
+["6.1","E","Self attention (Cheng 2016, Vaswani 2017) là gì?","Mỗi phần tử trong chuỗi chú ý tới các phần tử của chính chuỗi đó → biểu diễn nhạy ngữ cảnh","Mỗi phần tử chú ý tới chuỗi khác",["Chỉ dùng trong RNN","Chú ý chỉ tới chính nó"],"Context-sensitive encodings."],
+["6.1","E","Trong cơ chế attention, trọng số giữa các cặp query–key được chuẩn hóa thế nào?","Dùng softmax để tổng bằng 1","Chia cho số phần tử",["Dùng ReLU","Không chuẩn hóa"],"Ví dụ: a = [2.1, −0.1, 0.3, −1.0] → α = [0.76, 0.08, 0.13, 0.03]."],
+["6.1","E","Sau khi có trọng số α, đầu ra attention được tính bằng cách nào?","Tổng có trọng số các value vector","Lấy value có trọng số lớn nhất",["Nhân các key vector","Trung bình các query"],"Value thường là trạng thái encoder (giống key)."],
+["6.1","H","Với điểm attention a = [2.1, −0.1, 0.3, −1.0], từ nào nhận trọng số lớn nhất sau softmax và xấp xỉ bao nhiêu?","Từ thứ nhất, ≈ 0,76","Từ thứ ba, ≈ 0,13",["Từ thứ tư, ≈ 0,03","Bằng nhau, 0,25"],"Softmax giữ nguyên thứ tự; e^2.1 chiếm áp đảo."],
+["6.1","E","Bài báo giới thiệu Transformer là gì?","Attention is All You Need (Vaswani và cs., 2017)","Sequence to Sequence Learning (2014)",["BERT (2018)","Neural Machine Translation by Jointly Learning to Align and Translate (2015)"],"Transformer: mô hình seq2seq hoàn toàn dựa trên attention."],
+["6.1","E","Vì sao Transformer nhanh?","Chỉ dùng phép nhân ma trận, tính song song được trên toàn chuỗi (không hồi quy)","Vì có ít tham số",["Vì không dùng GPU","Vì dùng beam size 1"],"Slide: 'Fast: only matrix multiplications'."],
+["6.1","E","Hai loại Transformer được slide nêu là gì?","Encoder–Decoder (T5, mBART) và Decoder-only (GPT, LLaMa)","CNN và RNN",["Encoder-only (GPT) và Decoder-only (BERT)","Sinusoidal và RoPE"],"BERT là encoder-only (Bài 6.2)."],
+["6.1","E","Mô hình nào sau đây là decoder-only?","GPT, LLaMa","T5, mBART",["BERT, RoBERTa","ELMo"],"T5/mBART là encoder–decoder; BERT là encoder-only."],
+["6.1","E","Các khái niệm cốt lõi của Transformer theo slide gồm?","Positional encoding, multi-head attention, masked attention, residual + layer norm, feed-forward","Cổng quên, cổng vào, cổng ra",["Beam search, BLEU, greedy","CBOW, skip-gram, GloVe"],"Slide 'Core Transformer Concepts'."],
+["6.1","E","Đầu vào của Transformer thường được tách thành gì?","Subword (ví dụ: the book _s were improv _ed)","Ký tự đơn lẻ",["Câu hoàn chỉnh","Chỉ các từ trong từ điển"],"Input embedding được tra cứu như các mô hình trước."],
+["6.1","E","Trực giác của multi-head attention là gì?","Thông tin từ các phần khác nhau của câu hữu ích để giải nhập nhằng theo những cách khác nhau (vd. cú pháp gần, ngữ nghĩa xa)","Tăng tốc độ bằng cách bỏ bớt từ",["Mỗi head xử lý một câu khác nhau","Thay thế positional encoding"],"Ví dụ nhiều nghĩa của 'run': run a business, run a mile, made a run for it, stocking had a run."],
+["6.1","H","Công thức Multi-Head Attention là gì?","MultiHead(Q,K,V) = Concat(head1,…,headh)·W^O, với headi = Attention(Q·Wi^Q, K·Wi^K, V·Wi^V)","MultiHead = Σ headi",["MultiHead = softmax(QK)·V","MultiHead = max(headi)"],"Mỗi head có ma trận chiếu riêng; nối lại rồi nhân W^O."],
+["6.1","H","Trong đoạn code multi-head, lệnh query.view(nbatches, -1, self.heads, self.d_k).transpose(1, 2) dùng để làm gì?","Tách vector thành h head, mỗi head d_k chiều, và đưa chiều head lên trước chiều chuỗi","Nối các head lại",["Tính softmax","Thêm positional encoding"],"Kích thước sau: (batch, heads, seq_len, d_k). Sau attention: transpose ngược, view(nbatches, -1, h·d_k), rồi W_o."],
+["6.1","H","Công thức scaled dot-product attention chuẩn trong Transformer là gì?","softmax(QKᵀ / √d_k)·V","softmax(QK)·V",["QKᵀV / d_k","sigmoid(QKᵀ)·V"],"Chia √d_k để tránh tích vô hướng quá lớn làm softmax bão hòa (gradient nhỏ)."],
+["6.1","E","Vì sao Transformer cần positional encoding?","Vì attention thuần không phân biệt thứ tự: các từ giống nhau ở vị trí khác nhau sẽ có biểu diễn giống hệt","Để giảm số tham số",["Để thay thế embedding từ","Để tính BLEU"],"Ví dụ 'A big dog and a big cat': hai từ 'big' sẽ giống hệt nếu không có vị trí."],
+["6.1","E","Positional encoding được kết hợp với embedding như thế nào trong Transformer gốc?","Cộng (add) vào embedding từ","Nối (concat) với embedding",["Nhân với embedding","Thay thế embedding"],"w_big + w_pos2 vs w_big + w_pos6."],
+["6.1","H","Sinusoidal positional encoding tính chiều i của vị trí t như thế nào?","sin(ωk·t) nếu i = 2k (chẵn), cos(ωk·t) nếu i = 2k+1 (lẻ), với ωk = 1/10000^(2k/d)","Luôn dùng sin cho mọi chiều",["Giá trị học được bằng backprop","t / d cho mọi chiều"],"Vaswani 2017; tích vô hướng giữa hai vị trí gần nhau tương đối cao hơn."],
+["6.1","E","Ưu và nhược điểm của learned positional encoding (Shaw 2018) là gì?","Ưu: linh hoạt; Nhược: không thể ngoại suy cho chuỗi dài hơn khi huấn luyện","Ưu: ngoại suy tốt; Nhược: cố định",["Ưu: không cần tham số; Nhược: chậm","Ưu: mã hóa vị trí tương đối; Nhược: tốn bộ nhớ"],"Embedding vị trí chỉ có cho các vị trí đã thấy khi huấn luyện."],
+["6.1","H","Khác biệt giữa absolute và relative positional encoding là gì?","Absolute cộng mã vị trí vào đầu vào với hi vọng mô hình tự nắm vị trí tương đối; relative mã hóa tường minh vị trí tương đối","Absolute chỉ dùng cho decoder",["Relative không cần tham số nào","Hai loại hoàn toàn giống nhau"],"Slide Shaw+ 2018."],
+["6.1","H","Ý tưởng cốt lõi của RoPE (Rotary Positional Encoding, Su 2021) là gì?","Tích vô hướng giữa query và key là hàm của vị trí tương đối: fq(xm,m)·fk(xn,n) = g(xm, xn, m−n)","Cộng vector vị trí học được",["Dùng CNN để mã hóa vị trí","Bỏ vị trí và dùng RNN"],"RoPE dùng lượng giác và số phức (xoay từng cặp chiều một góc mθ)."],
+["6.1","E","Mô hình nào dùng RoPE theo bảng so sánh trong slide?","LLaMA","Transformer gốc (Vaswani)",["BERT","ELMo"],"Transformer gốc dùng sinusoidal."],
+["6.1","E","Layer Normalization (Ba 2016) có tác dụng gì?","Chuẩn hóa đầu ra về một khoảng nhất quán, tránh phương sai quá lớn về thang đo","Bỏ ngẫu nhiên nơ-ron",["Mã hóa vị trí","Tăng số head"],"Giúp ổn định huấn luyện."],
+["6.1","H","Công thức LayerNorm là gì?","LayerNorm(x) = (g / σ(x)) ⊙ (x − μ(x)) + b, với μ, σ là trung bình và độ lệch chuẩn của vector x","LayerNorm(x) = x / ‖x‖",["LayerNorm(x) = max(0, x)","LayerNorm(x) = x / RMS(x)"],"g: gain, b: bias."],
+["6.1","H","RMSNorm (Zhang & Sennrich 2019) đơn giản hóa LayerNorm như thế nào?","Bỏ phần trừ trung bình và bias: RMSNorm(x) = x / RMS(x) · g","Bỏ phần gain",["Thêm dropout","Chuẩn hóa theo batch"],"RMS(x) = √((1/n) Σ xi²)."],
+["6.1","E","Residual connection trong Transformer có dạng nào?","Residual(x, f) = f(x) + x","Residual(x, f) = f(x) · x",["Residual(x, f) = f(f(x))","Residual(x, f) = x − f(x)"],"Ngăn vanishing gradient và cho f học phần khác biệt so với đầu vào."],
+["6.1","H","Không có residual connection, self-attention có thể gặp vấn đề gì (câu 'Quiz' trong slide)?","Thông tin riêng của token có thể bị 'hòa tan' vào tổng có trọng số của các token khác, và gradient khó lan truyền qua nhiều tầng","Không tính được softmax",["Không cần positional encoding nữa","Mô hình chạy nhanh hơn nhiều"],"Residual giữ lại x nguyên gốc, attention chỉ cần học phần bổ sung."],
+["6.1","H","Pre-LayerNorm khác Post-LayerNorm thế nào và cái nào tốt hơn cho lan truyền gradient?","Pre-LN đặt LayerNorm trước sublayer (trong nhánh residual); Pre-LN tốt hơn cho lan truyền gradient","Post-LN tốt hơn vì chuẩn hóa sau cùng",["Hai cách tương đương hoàn toàn","Pre-LN bỏ residual connection"],"Xiong et al. 2020. Transformer gốc dùng Post, LLaMA dùng Pre."],
+["6.1","E","Lớp Feed-Forward trong Transformer có vai trò gì?","Trích xuất đặc trưng tổ hợp từ đầu ra đã qua attention","Tính trọng số attention",["Mã hóa vị trí","Chuẩn hóa đầu ra"],"FFN(x) = f(xW1 + b1)W2 + b2 – áp dụng độc lập cho từng vị trí."],
+["6.1","E","Hàm kích hoạt trong FFN của Transformer gốc và LLaMA lần lượt là gì?","ReLU và Swish/SiLU","Sigmoid và Tanh",["SiLU và ReLU","GELU và Softmax"],"Swish(x; β) = x ⊙ σ(βx)."],
+["6.1","E","Masked multi-head attention trong decoder dùng để làm gì?","Ngăn mỗi vị trí nhìn thấy các token tương lai (chỉ chú ý tới token trước nó)","Che 15% token ngẫu nhiên",["Che các token padding của encoder","Che các head không quan trọng"],"Đảm bảo tính tự hồi quy khi sinh; đầu vào decoder là outputs (shifted right)."],
+["6.1","H","Trong kiến trúc encoder–decoder Transformer, multi-head attention thứ hai của mỗi khối decoder là loại gì?","Cross-attention: query từ decoder, key/value từ đầu ra encoder","Self-attention có mask",["Self-attention không mask trên encoder","Attention trên positional encoding"],"Mỗi khối decoder: masked self-attn → cross-attn → FFN (mỗi cái có Add & Norm)."],
+["6.1","E","Optimizer nào áp dụng weight decay đúng cách cho Adam?","AdamW (Loshchilov & Hutter 2017)","SGD",["Adagrad","RMSProp"],"Adam thêm momentum và chuẩn hóa theo độ lệch chuẩn; AdamW tách weight decay để regularize đúng."],
+["6.1","H","Lịch learning rate của Vaswani 2017 có dạng gì?","lrate = d_model^−0.5 · min(step^−0.5, step · warmup_steps^−1.5): tăng tuyến tính trong warmup rồi giảm theo 1/√step","Learning rate cố định",["Giảm tuyến tính từ đầu","Tăng theo hàm mũ"],"Warmup giúp ổn định giai đoạn đầu huấn luyện."],
+["6.1","E","Khi huấn luyện Transformer bị 'hỏng' (loss tăng vọt), slide gợi ý làm gì?","Theo dõi chuẩn gradient; quay về checkpoint trước, xáo trộn dữ liệu và tiếp tục (và kiểm tra code)","Tăng learning rate",["Xóa toàn bộ checkpoint","Chuyển sang RNN"],"Kinh nghiệm từ nhật ký huấn luyện OPT-175B."],
+["6.1","E","Vì sao dùng huấn luyện độ chính xác thấp (low-precision)?","Huấn luyện ở 32-bit đầy đủ tốn kém (bộ nhớ, tính toán)","Để tăng độ chính xác",["Vì GPU không hỗ trợ 32-bit","Để giảm số tầng"],"Các lựa chọn: fp16, bf16…"],
+["6.1","H","Theo bảng so sánh, Transformer gốc (Vaswani) và LLaMA khác nhau ở những điểm nào?","Vị trí norm: Post vs Pre; loại norm: LayerNorm vs RMSNorm; phi tuyến: ReLU vs SiLU; vị trí: Sinusoidal vs RoPE","Số head và số tầng giống nhau nên không khác",["LLaMA dùng LSTM thay attention","LLaMA bỏ FFN"],"'Transformer++' (≈ LLaMA) hiệu quả hơn khoảng 10 lần (Gu & Dao 2023)."],
+["6.1","H","Theo Gu & Dao (2023) được trích trong slide, kiến trúc mạnh hơn ('Transformer++') hiệu quả hơn bao nhiêu?","Khoảng 10 lần","Khoảng 2 lần",["Khoảng 100 lần","Không khác biệt"],"'Stronger architecture is ≈10x more efficient!'"],
+["6.1","H","Độ phức tạp tính toán của self-attention theo độ dài chuỗi n là bao nhiêu?","O(n²·d) – bậc hai theo độ dài chuỗi","O(n·d)",["O(log n)","O(d²) không phụ thuộc n"],"Mỗi token tính điểm với mọi token khác → ma trận n×n. Đây là lý do có Longformer, BigBird."],
+["6.1","E","Đầu ra cuối cùng của decoder Transformer trước khi ra xác suất từ là gì?","Linear rồi Softmax trên từ vựng","Sigmoid trên từng từ",["LayerNorm rồi argmax","Cross-attention"],"Output probabilities."],
+["6.1","H","Vấn đề gradient biến mất/bùng nổ có còn xảy ra với Transformer nhiều tầng không?","Có — vấn đề tương tự xảy ra trong transformer nhiều tầng, nên cần residual, LayerNorm, warmup","Không, Transformer miễn nhiễm",["Chỉ xảy ra với encoder","Chỉ xảy ra khi dùng RoPE"],"Slide 'Reminder: Gradients and Training Instability'."],
+
+// ================= BÀI 6.2 – Encoder-only (BERT) =================
+["6.2","E","BERT được công bố khi nào và đạt giải gì?","Tháng 10/2018, Best paper NAACL 2019","Năm 2017, Best paper NeurIPS",["Năm 2020, Best paper ACL","Năm 2014, Best paper EMNLP"],"BERT – Devlin và cs."],
+["6.2","E","BERT là viết tắt của gì?","Bidirectional Encoder Representations from Transformers","Basic Encoder for Recurrent Text",["Bidirectional Embedding from Recurrent Transformers","Binary Encoder Representation Tool"],"Mô hình encoder-only."],
+["6.2","E","ELMo được huấn luyện như thế nào (theo slide BERT)?","Hai LM một chiều riêng biệt (trái→phải và phải→trái) dựa trên LSTM","Một Transformer encoder hai chiều",["Một Transformer decoder trái→phải","Một CNN mức từ"],"Tiếp cận feature-based; huấn luyện trên câu đơn của 1B Word Benchmark."],
+["6.2","E","OpenAI GPT (2018) được huấn luyện như thế nào?","Một LM một chiều trái→phải dựa trên Transformer decoder sâu","Hai LSTM hai chiều",["Masked language modeling","Ma trận đồng xuất hiện"],"Tiếp cận fine-tuning; đoạn 512 token trên BooksCorpus."],
+["6.2","H","Khác biệt giữa cách tiếp cận feature-based (ELMo) và fine-tuning (GPT, BERT) là gì?","Feature-based: dùng biểu diễn tiền huấn luyện làm đặc trưng đầu vào cho mô hình riêng của bài toán; Fine-tuning: thêm tối thiểu tham số và cập nhật toàn bộ tham số trên dữ liệu bài toán","Feature-based cập nhật mọi tham số",["Fine-tuning không cần dữ liệu gán nhãn","Hai cách giống nhau"],"Fine-tuning hấp dẫn hơn: không cần kiến trúc riêng, tái dùng trọng số → mạnh hơn."],
+["6.2","E","Đóng góp then chốt của BERT là gì?","Học biểu diễn dựa trên ngữ cảnh hai chiều bằng Transformer encoder sâu, theo hướng fine-tuning","Dùng LSTM hai chiều",["Dùng Transformer decoder một chiều","Dùng ma trận đồng xuất hiện"],"Ví dụ 'bank' trong 'river bank' và 'go to bank to make a deposit'."],
+["6.2","E","Hai mục tiêu tiền huấn luyện của BERT là gì?","Masked Language Modeling (MLM) và Next Sentence Prediction (NSP)","Dự đoán từ tiếp theo và dịch máy",["CBOW và Skip-gram","Phân loại spam và NER"],"Huấn luyện cùng lúc."],
+["6.2","H","Vì sao không thể huấn luyện mô hình ngôn ngữ chuẩn (dự đoán từ tiếp theo) với mô hình hai chiều?","Vì mỗi từ sẽ gián tiếp 'nhìn thấy chính nó' qua ngữ cảnh hai chiều nhiều tầng, khiến bài toán dự đoán trở nên tầm thường","Vì mô hình hai chiều không có softmax",["Vì thiếu dữ liệu","Vì không có positional encoding"],"Giải pháp: che k% từ rồi dự đoán các từ bị che (MLM)."],
+["6.2","E","Tỉ lệ token được chọn để dự đoán trong MLM của BERT là bao nhiêu?","15%","50%",["5%","100%"],"k = 15%."],
+["6.2","H","Vì sao không chọn tỉ lệ che quá nhỏ hoặc quá lớn trong MLM?","Quá ít: tốn chi phí tính toán (ít tín hiệu học mỗi lượt); quá nhiều: không đủ ngữ cảnh","Quá ít: mô hình quá khớp; quá nhiều: mô hình chạy nhanh",["Tỉ lệ không ảnh hưởng","Quá nhiều làm từ vựng tăng"],"Xem thêm Wettig et al., 2022 về tỉ lệ che."],
+["6.2","E","Trong BERT gốc, các token bị che được chọn như thế nào?","Lấy mẫu đều (uniform) 15% token","Che toàn bộ một câu",["Che các danh từ riêng","Che các từ dừng"],"Các cải tiến: span masking (SpanBERT, Joshi 2020), PMI masking (Levine 2021); T5 dùng span masking."],
+["6.2","E","Chiến lược 80-10-10 trong MLM là gì?","Trong 15% token được chọn: 80% thay bằng [MASK], 10% thay bằng từ ngẫu nhiên, 10% giữ nguyên","80% giữ nguyên, 10% [MASK], 10% xóa",["80% từ ngẫu nhiên, 10% [MASK], 10% giữ nguyên","Che 80% câu, 10% đoạn, 10% văn bản"],"Ví dụ: went to the store → [MASK] / running / store."],
+["6.2","H","Lý do dùng chiến lược 80-10-10 thay vì luôn thay bằng [MASK]?","Vì token [MASK] không bao giờ xuất hiện khi fine-tuning, cần giảm chênh lệch giữa tiền huấn luyện và fine-tuning","Để tăng tốc huấn luyện",["Để giảm kích thước từ vựng","Để huấn luyện NSP"],"Xem Table 8 (ablation) trong bài báo."],
+["6.2","E","Động cơ của Next Sentence Prediction (NSP) là gì?","Nhiều bài toán downstream cần hiểu quan hệ giữa hai câu (NLI, paraphrase, QA)","Để sinh câu tiếp theo",["Để tăng số token bị che","Để học vị trí"],"NSP nhằm giảm khoảng cách giữa tiền huấn luyện và fine-tuning."],
+["6.2","E","Dữ liệu NSP được tạo như thế nào?","50% là hai đoạn liền kề (IsNext), 50% đoạn thứ hai là đoạn ngẫu nhiên từ corpus (NotNext)","100% hai câu liền kề",["Hai câu từ hai ngôn ngữ","Một câu và bản dịch của nó"],"Phân lớp nhị phân trên [CLS]."],
+["6.2","E","Token [CLS] và [SEP] trong BERT có vai trò gì?","[CLS] luôn ở đầu chuỗi (biểu diễn cho cả chuỗi); [SEP] ngăn cách hai đoạn","[CLS] che từ; [SEP] kết thúc batch",["[CLS] là padding; [SEP] là từ chưa biết","Cả hai đều là token che"],"[CLS] được tiền huấn luyện cho NSP."],
+["6.2","E","Kích thước từ vựng của BERT là bao nhiêu?","30.000 WordPiece (đơn vị subword)","50.000 BPE",["110.000 từ","1 triệu từ"],"WordPiece – Wu et al., 2016. Multilingual BERT dùng 110k WordPiece chung."],
+["6.2","H","Input embedding của BERT là tổng của những embedding nào?","Token embedding + Segment embedding + Position embedding","Token embedding + Character embedding",["Chỉ token embedding","Token embedding × Position embedding"],"Segment embedding phân biệt đoạn A và đoạn B."],
+["6.2","E","Cấu hình BERT-base là gì?","12 tầng, hidden 768, 12 attention head, 110M tham số","24 tầng, hidden 1024, 16 head, 340M tham số",["6 tầng, hidden 512, 8 head, 65M tham số","12 tầng, hidden 1024, 16 head, 175B tham số"],"BERT-base có cùng kích thước với OpenAI GPT để so sánh công bằng."],
+["6.2","E","Cấu hình BERT-large là gì?","24 tầng, hidden 1024, 16 attention head, 340M tham số","12 tầng, hidden 768, 12 head, 110M tham số",["48 tầng, hidden 1600, 25 head, 1,5B tham số","24 tầng, hidden 768, 12 head, 220M tham số"],"Slide 12."],
+["6.2","H","BERT-base được thiết kế có cùng kích thước với mô hình nào?","OpenAI GPT","ELMo",["T5","RoBERTa"],"Để so sánh trực tiếp hiệu quả của ngữ cảnh hai chiều."],
+["6.2","E","BERT được tiền huấn luyện trên corpus nào?","Wikipedia (2,5 tỉ từ) + BooksCorpus (0,8 tỉ từ)","Chỉ BooksCorpus",["Chỉ 1B Word Benchmark","Common Crawl 1 nghìn tỉ từ"],"OpenAI GPT chỉ huấn luyện trên BooksCorpus."],
+["6.2","E","Độ dài chuỗi tối đa của BERT là bao nhiêu?","512 word piece","128 từ",["1024 ký tự","2048 token"],"Khoảng 256 + 256 cho hai đoạn."],
+["6.2","H","Thông số huấn luyện BERT theo slide là gì?","1 triệu bước (1M steps), batch size 128k (token)","10 nghìn bước, batch 32",["100 epoch, batch 1","1 tỉ bước, batch 1M"],"Slide 12."],
+["6.2","H","Trong tiền huấn luyện BERT, biểu diễn nào được huấn luyện cho NSP và biểu diễn nào cho MLM?","[CLS] cho NSP; các token còn lại cho MLM","[SEP] cho NSP; [CLS] cho MLM",["Tất cả token cho NSP","[MASK] cho NSP"],"MLM và NSP được huấn luyện đồng thời."],
+["6.2","E","Khẩu hiệu sử dụng BERT là gì?","Pretrain once, finetune many times","Train from scratch for every task",["Finetune once, pretrain many times","Attention is all you need"],"Một mô hình tiền huấn luyện dùng cho nhiều bài toán."],
+["6.2","E","Với bài toán phân lớp cấp câu, BERT fine-tuning thêm gì?","Một bộ phân lớp tuyến tính trên biểu diễn [CLS]","Một LSTM mới trên từng token",["Một decoder Transformer","Một bộ CRF trên [SEP]"],"Số tham số mới: C × h (C: số lớp, h: hidden size)."],
+["6.2","H","Fine-tune BERT-base cho MNLI (3 lớp) thêm bao nhiêu tham số trọng số mới (không tính bias)?","3 × 768 = 2.304","768 × 768",["3 × 1024 = 3.072","110 triệu"],"C × h với C = 3, h = 768."],
+["6.2","E","Với bài toán cấp token (NER, QA trích xuất), BERT fine-tuning như thế nào?","Thêm bộ phân lớp tuyến tính trên biểu diễn ẩn của từng token","Chỉ dùng [CLS]",["Thêm decoder sinh câu","Dùng NSP"],"Ví dụ NER CoNLL 2003 với nhãn BIO."],
+["6.2","H","Với SQuAD (QA trích xuất), BERT dự đoán câu trả lời như thế nào?","Dự đoán vị trí bắt đầu và kết thúc của đoạn trả lời trong passage (span)","Sinh câu trả lời từng từ",["Phân lớp câu hỏi","Chọn trong 4 đáp án"],"Thêm hai vector (start, end) → 2 × h tham số mới."],
+["6.2","E","MNLI là bài toán gì và có các nhãn nào?","Suy diễn ngôn ngữ tự nhiên: entailment, contradiction, neutral","Phân tích cảm xúc: positive, negative",["Phát hiện câu hỏi trùng: duplicate, not duplicate","NER: PER, LOC, ORG"],"Ví dụ: 'A soccer game with multiple males playing' → 'Some men are playing a sport': entailment."],
+["6.2","E","QQP (Quora Question Pairs) là bài toán gì?","Xác định hai câu hỏi có trùng ý nghĩa hay không (duplicate / not duplicate)","Phân tích cảm xúc",["Trả lời câu hỏi","Dịch câu hỏi"],"Bài toán phân lớp cặp câu."],
+["6.2","E","SST-2 là bài toán gì?","Phân lớp cảm xúc một câu (positive/negative)","Phân lớp cặp câu",["Nhận dạng thực thể","QA trích xuất"],"Ví dụ: 'rich veins of funny stuff in this movie' → positive."],
+["6.2","H","Theo slide, GLUE (Wang et al., 2019) dùng trong BERT gồm bao nhiêu bài toán?","6 bài toán cặp câu và 2 bài toán câu đơn","10 bài toán cấp token",["1 bài toán duy nhất","4 bài toán sinh văn bản"],"Slide 16."],
+["6.2","H","Kết quả ablation về tác vụ tiền huấn luyện của BERT là gì?","MLM tốt hơn nhiều so với LM trái→phải; NSP giúp một số bài toán (nhưng công trình sau cho rằng NSP không hữu ích)","NSP quan trọng hơn MLM",["LM trái→phải tốt hơn MLM","Không có khác biệt"],"Liu et al. 2019 (RoBERTa), Joshi et al. 2020."],
+["6.2","E","Kết quả ablation về kích thước mô hình BERT cho thấy gì?","Càng lớn càng tốt (the bigger, the better)","Mô hình nhỏ tốt hơn",["Kích thước không ảnh hưởng","Chỉ số head quan trọng"],"Tăng số tầng, hidden size, số head đều cải thiện."],
+["6.2","H","Vì sao MLM hội tụ chậm hơn một chút so với LM trái→phải?","Vì mỗi lượt chỉ dự đoán 15% token","Vì MLM dùng LSTM",["Vì MLM không dùng softmax","Vì MLM dùng beam search"],"Nhưng MLM vượt LM L→R về độ chính xác gần như ngay từ đầu."],
+["6.2","E","RoBERTa cải tiến BERT như thế nào?","Huấn luyện trên dữ liệu gấp 10 lần, lâu hơn và bỏ NSP","Thêm decoder",["Chia sẻ tham số giữa các tầng","Dự đoán 100% token"],"Mạnh hơn nhiều (vd. SQuAD 94,6 so với 90,9)."],
+["6.2","E","ALBERT có đặc điểm gì?","Chia sẻ tham số giữa các tầng → ít bộ nhớ lưu trữ, hiệu năng mạnh nhưng chạy chậm hơn","Bỏ NSP và tăng dữ liệu 10 lần",["Dự đoán 100% token","Xử lý văn bản dài"],"Lan et al., 2020."],
+["6.2","E","ELECTRA hiệu quả hơn BERT trong huấn luyện vì sao?","Dự đoán trên 100% token thay vì chỉ 15% (phân biệt token thật/bị thay thế)","Bỏ attention",["Dùng mô hình nhỏ hơn","Không cần dữ liệu"],"Clark et al., 2020."],
+["6.2","E","Mô hình nào được thiết kế để xử lý ngữ cảnh dài (≫ 512 token)?","Longformer, BigBird","DistilBERT, TinyBERT",["SciBERT, BioBERT","ELMo, GloVe"],"Dùng attention thưa để giảm độ phức tạp bậc hai."],
+["6.2","E","Mục đích của DistilBERT, TinyBERT là gì?","Làm BERT nhỏ hơn để dễ sử dụng (nén/chưng cất)","Mở rộng BERT cho y sinh",["Xử lý văn bản dài","Đa ngôn ngữ"],"Knowledge distillation."],
+["6.2","E","SciBERT, BioBERT, FinBERT, ClinicalBERT là ví dụ của hướng nào?","Mở rộng BERT cho các lĩnh vực chuyên ngành","Làm BERT nhỏ hơn",["BERT đa ngôn ngữ","BERT cho văn bản dài"],"Tiền huấn luyện tiếp trên corpus chuyên ngành."],
+["6.2","H","Multilingual BERT được huấn luyện thế nào?","Một mô hình duy nhất trên Wikipedia của 104 ngôn ngữ, chung từ vựng 110k WordPiece","Một mô hình riêng cho mỗi ngôn ngữ",["Chỉ tiếng Anh và tiếng Trung","Trên dữ liệu song ngữ có căn chỉnh"],"Slide 29."],
+["6.2","H","Vì sao các mô hình lớn nhất hiện nay (GPT, LLaMA) thường là một chiều (decoder-only) thay vì như BERT?","Mô hình một chiều sinh văn bản tự nhiên, học từ 100% token và thống nhất mọi tác vụ dưới dạng sinh; BERT khó sinh văn bản","Vì mô hình hai chiều không huấn luyện được",["Vì BERT không dùng Transformer","Vì một chiều luôn chính xác hơn trên mọi bài toán hiểu"],"Câu hỏi thảo luận Q3 trong slide; BERT không phù hợp để sinh văn bản (slide 'Text generation using BERT')."],
+["6.2","H","So sánh ELMo, GPT, BERT: phát biểu nào đúng?","ELMo: LSTM, 2 LM một chiều, feature-based; GPT: Transformer decoder, một chiều, fine-tuning; BERT: Transformer encoder, hai chiều, fine-tuning","Cả ba đều dùng Transformer encoder",["BERT là feature-based, ELMo là fine-tuning","GPT huấn luyện hai chiều bằng MLM"],"Bảng so sánh tổng hợp từ slide 4–6."],
+["6.2","H","Trong ví dụ MLM 'He [MASK] from Kuala [MASK], Malaysia', vấn đề của che token đều (uniform) là gì?","Từ 'Lumpur' quá dễ đoán từ 'Kuala' → nên che cả cụm (span/PMI masking)","Câu quá ngắn",["Không có [CLS]","Không thể dự đoán động từ"],"Dẫn tới SpanBERT và PMI masking."],
+["6.2","H","Một bài toán cấp token có C nhãn, BERT hidden size h. Fine-tune thêm bao nhiêu tham số trọng số mới?","C × h (một lớp tuyến tính dùng chung cho mọi token)","C × h × độ dài chuỗi",["h × h","C × 512"],"Lớp phân lớp được chia sẻ giữa các vị trí token."],
+];
+// Câu hỏi BỔ SUNG KIẾN THỨC (ngoài slide). Format: [bài, độ khó, câu hỏi, đáp án đúng, sai1, [sai2, sai3], giải thích]
+const QX_A = [
+// ===== Bài 1 – mở rộng =====
+["1","E","Các giai đoạn phát triển chính của NLP theo thứ tự thời gian là gì?","Dựa trên luật → Thống kê/học máy → Học sâu (neural) → Mô hình tiền huấn luyện/LLM","Học sâu → Dựa trên luật → Thống kê → LLM",["Thống kê → LLM → Dựa trên luật → Học sâu","LLM → Học sâu → Thống kê → Dựa trên luật"],"Luật (1950–80s, ELIZA), thống kê (1990s–2000s, HMM/CRF/SMT), neural (2013+, word2vec, seq2seq), pretrained (2018+, BERT/GPT)."],
+["1","E","ELIZA (1966) là gì?","Chatbot sớm dựa trên luật khớp mẫu, mô phỏng nhà trị liệu tâm lý","Mô hình dịch máy thống kê đầu tiên",["Mạng nơ-ron hồi quy đầu tiên","Bộ gán nhãn từ loại dùng HMM"],"ELIZA không 'hiểu' mà chỉ dùng mẫu và luật thay thế."],
+["1","E","Các mức phân tích ngôn ngữ từ thấp đến cao là gì?","Hình thái (morphology) → Cú pháp (syntax) → Ngữ nghĩa (semantics) → Ngữ dụng (pragmatics)","Ngữ dụng → Ngữ nghĩa → Cú pháp → Hình thái",["Cú pháp → Hình thái → Ngữ dụng → Ngữ nghĩa","Ngữ nghĩa → Hình thái → Cú pháp → Ngữ dụng"],"Ngữ dụng xét ý nghĩa trong ngữ cảnh sử dụng (hàm ý, mỉa mai…)."],
+["1","H","Định luật Zipf phát biểu điều gì về tần suất từ trong corpus?","Tần suất của từ tỉ lệ nghịch với thứ hạng của nó (f ∝ 1/r)","Mọi từ có tần suất bằng nhau",["Tần suất tỉ lệ thuận với độ dài từ","Tần suất tăng theo hàm mũ của thứ hạng"],"Hệ quả: vài từ rất phổ biến (stopwords), rất nhiều từ hiếm (long tail) → vấn đề dữ liệu thưa."],
+["1","H","Khoảng cách Levenshtein (edit distance) giữa 'kitten' và 'sitting' là bao nhiêu?","3","2",["4","6"],"k→s (thay), e→i (thay), thêm g (chèn) = 3. Dùng trong kiểm tra chính tả để tìm từ gợi ý gần nhất."],
+["1","E","Ba phép biến đổi cơ bản trong khoảng cách Levenshtein là gì?","Chèn, xóa, thay thế ký tự","Cộng, trừ, nhân",["Đảo, xoay, lật","Tách, ghép, nén"],"Biến thể Damerau-Levenshtein thêm phép hoán vị hai ký tự kề nhau."],
+["1","E","Thư viện xử lý tiếng Việt nào sau đây là phổ biến?","underthesea, VnCoreNLP, pyvi","OpenCV, Pillow",["NumPy, SciPy","Flask, Django"],"Cung cấp tách từ, gán nhãn từ loại, NER, phân tích cú pháp cho tiếng Việt."],
+["1","E","Hugging Face Transformers là gì?","Thư viện cung cấp hàng nghìn mô hình tiền huấn luyện (BERT, GPT, T5…) và tokenizer","Một bộ dữ liệu song ngữ",["Một trình soạn thảo văn bản","Một thuật toán tách từ"],"Kèm Hub để chia sẻ mô hình, datasets, và API pipeline() cho các tác vụ phổ biến."],
+["1","H","Trên tập dữ liệu mất cân bằng (99% ham, 1% spam), vì sao accuracy là độ đo kém?","Mô hình luôn đoán 'ham' vẫn đạt 99% accuracy nhưng không bắt được spam nào","Accuracy không tính được khi có 2 lớp",["Accuracy luôn bằng F1","Accuracy chỉ dùng cho hồi quy"],"Nên dùng precision, recall, F1 hoặc PR-AUC cho lớp thiểu số."],
+["1","H","Công thức F1-score là gì?","F1 = 2·P·R / (P + R)","F1 = (P + R) / 2",["F1 = P·R","F1 = 2·(P + R) / (P·R)"],"Trung bình điều hòa của precision và recall, phạt mạnh khi một trong hai thấp."],
+["1","E","Precision (độ chính xác) đo điều gì?","Trong các mẫu mô hình dự đoán là dương, bao nhiêu phần đúng là dương: TP / (TP + FP)","Trong các mẫu thực sự dương, bao nhiêu được tìm ra",["Tỉ lệ mẫu dự đoán đúng trên tổng","Tỉ lệ mẫu âm bị dự đoán nhầm"],"Recall = TP / (TP + FN)."],
+["1","H","Macro-F1 và Micro-F1 khác nhau thế nào trong phân lớp nhiều lớp?","Macro tính F1 từng lớp rồi lấy trung bình (các lớp ngang nhau); Micro gộp TP/FP/FN của mọi lớp rồi tính (thiên về lớp lớn)","Macro luôn lớn hơn Micro",["Micro tính từng lớp rồi lấy trung bình","Hai cách luôn bằng nhau"],"Với dữ liệu mất cân bằng, macro-F1 phản ánh tốt hơn hiệu năng trên lớp nhỏ."],
+["1","E","Vì sao cần chia dữ liệu thành train / validation (dev) / test?","Train để học, dev để chọn siêu tham số/mô hình, test để đánh giá khách quan cuối cùng","Để tăng kích thước dữ liệu",["Để giảm số đặc trưng","Vì mô hình chỉ đọc được 1/3 dữ liệu"],"Dùng test để chỉnh siêu tham số sẽ làm kết quả lạc quan giả tạo (data leakage)."],
+["1","H","Byte Pair Encoding (BPE) tạo từ vựng subword như thế nào?","Bắt đầu từ ký tự, lặp lại việc gộp cặp ký hiệu kề nhau xuất hiện nhiều nhất cho đến khi đạt kích thước từ vựng mong muốn","Cắt từ theo độ dài cố định 3 ký tự",["Dùng từ điển do chuyên gia xây dựng","Chọn ngẫu nhiên các chuỗi con"],"BPE dùng trong GPT, RoBERTa; giải quyết OOV vì từ lạ vẫn phân rã được thành subword/ký tự."],
+["1","E","Chuẩn hóa văn bản (text normalization) thường gồm những bước nào?","Chuyển chữ thường, chuẩn hóa Unicode/dấu, xử lý số, viết tắt, URL, emoji","Dịch văn bản sang tiếng Anh",["Tóm tắt văn bản","Gán nhãn thực thể"],"Với tiếng Việt cần chuẩn hóa kiểu gõ dấu (òa/oà) và bảng mã Unicode dựng sẵn/tổ hợp."],
+["1","H","Phép kiểm tra Turing (Turing test) đánh giá điều gì?","Máy có thể hội thoại mà người đánh giá không phân biệt được với con người hay không","Tốc độ xử lý văn bản của máy",["Độ chính xác dịch máy theo BLEU","Khả năng nhận dạng giọng nói"],"Do Alan Turing đề xuất năm 1950 ('Computing Machinery and Intelligence')."],
+["1","E","spaCy là gì?","Thư viện NLP công nghiệp cho Python, tối ưu tốc độ, có pipeline tách từ, POS, NER, dependency parsing","Bộ dữ liệu cảm xúc",["Thuật toán word embedding","Độ đo đánh giá dịch máy"],"NLTK thiên về giáo dục/nghiên cứu; spaCy thiên về sản phẩm."],
+["1","H","Phân tích cú pháp phụ thuộc (dependency parsing) biểu diễn câu dưới dạng gì?","Các quan hệ có hướng giữa từ chính (head) và từ phụ thuộc (dependent), ví dụ nsubj, obj","Cây thành phần với các nút NP, VP",["Chuỗi nhãn BIO","Vector one-hot"],"Phân tích thành phần (constituency) thì dùng cây cụm từ NP, VP, PP."],
+["1","E","Corpus song ngữ (parallel corpus) dùng cho bài toán nào?","Dịch máy (cặp câu nguồn – câu đích tương ứng)","Phân tích cảm xúc",["Kiểm tra chính tả","Phân cụm văn bản"],"Ví dụ: Europarl, WMT, OPUS; với tiếng Việt có PhoMT, IWSLT En–Vi."],
+["1","H","Annotation agreement (độ đồng thuận giữa người gán nhãn) thường đo bằng chỉ số nào?","Cohen's Kappa (hoặc Fleiss' Kappa cho nhiều người)","BLEU",["Perplexity","Cosine similarity"],"Kappa hiệu chỉnh cho phần đồng thuận do ngẫu nhiên; κ > 0,8 thường coi là rất tốt."],
+
+// ===== Bài 2 – mở rộng =====
+["2","E","Multinomial Naive Bayes và Bernoulli Naive Bayes khác nhau thế nào?","Multinomial dùng số lần xuất hiện của từ; Bernoulli chỉ dùng có/không xuất hiện (nhị phân) và tính cả từ vắng mặt","Bernoulli dùng tần suất; Multinomial dùng nhị phân",["Hai mô hình giống hệt nhau","Multinomial chỉ dùng cho dữ liệu liên tục"],"Gaussian NB dùng cho đặc trưng liên tục (giả định phân phối chuẩn)."],
+["2","H","Additive (Lidstone) smoothing tổng quát hóa Laplace thế nào?","Cộng α (0 < α ≤ 1) thay vì 1: (count + α) / (N + α·V); Laplace là trường hợp α = 1","Nhân xác suất với α",["Bỏ các từ hiếm","Chỉ áp dụng cho prior"],"Trong scikit-learn, MultinomialNB(alpha=1.0) là Laplace."],
+["2","E","Logistic regression dùng hàm nào để biến tổ hợp tuyến tính thành xác suất?","Sigmoid σ(z) = 1 / (1 + e^(−z))","ReLU",["Tanh","Hàm bậc thang"],"Với nhiều lớp dùng softmax (multinomial logistic regression)."],
+["2","H","Hàm mất mát khi huấn luyện logistic regression là gì?","Cross-entropy (log loss): −[y log p + (1−y) log(1−p)]","Bình phương sai số",["Hinge loss","Khoảng cách Levenshtein"],"Hinge loss là của SVM."],
+["2","E","SVM tuyến tính tìm siêu phẳng như thế nào?","Siêu phẳng phân tách có lề (margin) lớn nhất giữa hai lớp","Siêu phẳng đi qua trung bình dữ liệu",["Siêu phẳng tối thiểu số đặc trưng","Siêu phẳng ngẫu nhiên"],"Các điểm nằm trên lề gọi là support vectors."],
+["2","H","Trong lọc thư rác, vì sao false positive (ham bị đánh là spam) thường nghiêm trọng hơn false negative?","Người dùng có thể mất email quan trọng; một email rác lọt vào hộp thư chỉ gây phiền","False positive không thể xảy ra",["False negative làm hỏng máy chủ","Hai loại lỗi luôn có chi phí như nhau"],"Vì vậy thường tối ưu precision cao cho lớp spam hoặc điều chỉnh ngưỡng quyết định."],
+["2","H","Sublinear TF scaling là gì?","Thay tf bằng 1 + log(tf) để giảm ảnh hưởng của từ lặp lại quá nhiều lần","Thay tf bằng tf²",["Đặt tf = 1 cho mọi từ","Chia tf cho độ dài từ vựng"],"Từ xuất hiện 20 lần không quan trọng gấp 20 lần từ xuất hiện 1 lần."],
+["2","E","Vì sao vector TF-IDF thường được chuẩn hóa L2?","Để văn bản dài và ngắn so sánh được (độ dài vector = 1), tích vô hướng chính là cosine","Để loại bỏ stopwords",["Để giảm số chiều","Để tăng IDF"],"TfidfVectorizer mặc định norm='l2'."],
+["2","H","Trong scikit-learn TfidfVectorizer, tham số min_df=2 và max_df=0.9 có tác dụng gì?","Bỏ từ xuất hiện ở ít hơn 2 văn bản và từ xuất hiện ở hơn 90% văn bản","Giữ đúng 2 đến 90 từ",["Chỉ giữ bi-gram","Đặt IDF tối thiểu là 2"],"Lọc từ quá hiếm (nhiễu) và quá phổ biến (gần như stopwords)."],
+["2","E","Tham số ngram_range=(1,2) trong CountVectorizer nghĩa là gì?","Dùng cả uni-gram và bi-gram làm đặc trưng","Chỉ dùng bi-gram",["Dùng n-gram ký tự độ dài 1–2","Dùng 1 đến 2 văn bản"],"Tăng khả năng nắm thứ tự từ cục bộ nhưng tăng mạnh số chiều."],
+["2","H","Hashing trick (HashingVectorizer) giải quyết vấn đề gì?","Ánh xạ từ vào số chiều cố định bằng hàm băm, không cần lưu từ điển → tiết kiệm bộ nhớ, xử lý dữ liệu luồng","Loại bỏ hoàn toàn va chạm",["Tăng độ chính xác so với TF-IDF","Tạo embedding ngữ nghĩa"],"Đổi lại có thể có va chạm băm và không ánh xạ ngược được đặc trưng → từ."],
+["2","H","Chi-square (χ²) hoặc Mutual Information dùng trong phân loại văn bản để làm gì?","Chọn đặc trưng: giữ các từ có liên hệ thống kê mạnh nhất với nhãn lớp","Làm mịn xác suất",["Tính khoảng cách giữa văn bản","Tách từ"],"Giảm số chiều, giảm nhiễu, tăng tốc huấn luyện."],
+["2","E","Vì sao ma trận BoW/TF-IDF thường được lưu dưới dạng ma trận thưa (sparse)?","Mỗi văn bản chỉ chứa một phần rất nhỏ từ vựng nên hầu hết giá trị bằng 0","Vì giá trị luôn âm",["Vì ma trận luôn vuông","Vì cần GPU"],"Ví dụ scipy.sparse CSR."],
+["2","H","PMI (Pointwise Mutual Information) giữa hai từ w và c được định nghĩa thế nào?","PMI(w,c) = log [P(w,c) / (P(w)·P(c))]","PMI = P(w,c) − P(w)",["PMI = P(w)·P(c)","PMI = log P(w|c)·P(c)"],"PPMI = max(PMI, 0) thường thay số đếm thô trong ma trận đồng xuất hiện."],
+["2","H","LSA (Latent Semantic Analysis) làm gì với ma trận từ–văn bản?","Áp dụng SVD rút gọn để chiếu từ và văn bản vào không gian ngữ nghĩa ẩn ít chiều","Đếm lại tần suất từ",["Gán nhãn từ loại","Huấn luyện mạng LSTM"],"Giảm chiều và gom các từ đồng nghĩa (đồng xuất hiện tương tự) lại gần nhau."],
+["2","E","Độ tương tự cosine giữa hai vector được tính thế nào?","cos(A,B) = A·B / (‖A‖·‖B‖)","‖A − B‖",["A·B","|A| + |B|"],"Giá trị trong [−1, 1]; với TF-IDF (không âm) nằm trong [0, 1]."],
+["2","H","Vì sao Naive Bayes thường hoạt động tốt dù giả định độc lập bị vi phạm?","Phân lớp chỉ cần argmax đúng, không cần xác suất chính xác; NB ít tham số nên ít overfit với dữ liệu nhỏ, nhiều chiều","Vì giả định độc lập luôn đúng trong văn bản",["Vì NB dùng lan truyền ngược","Vì NB không cần dữ liệu huấn luyện"],"Tuy nhiên xác suất dự đoán của NB thường bị lệch về 0/1 (kém hiệu chỉnh)."],
+["2","H","Khi chia train/test cho dữ liệu spam mất cân bằng, nên dùng cách chia nào?","Stratified split – giữ tỉ lệ các lớp như nhau ở train và test","Chia theo thứ tự file",["Đưa toàn bộ spam vào test","Chia ngẫu nhiên không cần quan tâm tỉ lệ"],"train_test_split(..., stratify=y) trong scikit-learn."],
+["2","E","ROC-AUC đo điều gì?","Khả năng xếp hạng mẫu dương cao hơn mẫu âm trên mọi ngưỡng (diện tích dưới đường TPR–FPR)","Độ chính xác tại ngưỡng 0,5",["Số đặc trưng tối ưu","Thời gian huấn luyện"],"AUC = 0,5 tương đương đoán ngẫu nhiên; = 1 là hoàn hảo."],
+["2","H","Lời nguyền số chiều (curse of dimensionality) ảnh hưởng tới biểu diễn BoW như thế nào?","Số chiều rất lớn so với số mẫu khiến dữ liệu thưa, khoảng cách kém ý nghĩa, dễ overfit với mô hình phức tạp","Làm mô hình không chạy được",["Giảm số từ vựng","Không ảnh hưởng gì"],"Giải pháp: chọn đặc trưng, giảm chiều (SVD), regularization, mô hình tuyến tính đơn giản."],
+["2","E","Regularization L2 trong logistic regression có tác dụng gì?","Phạt trọng số lớn, giảm overfit khi số đặc trưng lớn","Tăng số đặc trưng",["Bỏ các từ hiếm","Tăng tốc tính TF-IDF"],"L1 tạo nghiệm thưa (tự chọn đặc trưng)."],
+["2","H","Cross-validation k-fold dùng để làm gì?","Ước lượng hiệu năng ổn định hơn bằng cách lần lượt dùng mỗi fold làm tập kiểm tra và trung bình kết quả","Tăng dữ liệu huấn luyện lên k lần",["Chọn ngẫu nhiên k đặc trưng","Huấn luyện k mô hình khác loại"],"Hay dùng để chọn siêu tham số (GridSearchCV)."],
+["2","H","N-gram ký tự (character n-grams) hữu ích cho lọc thư rác vì sao?","Bắt được biến thể cố tình lách luật như 'v1agra', 'fr€e' và lỗi chính tả","Giảm số chiều so với từ",["Nắm được ngữ nghĩa câu","Không cần tiền xử lý"],"Spammer thường biến dạng từ khóa để tránh bộ lọc dựa trên từ."],
+["2","E","Đặc trưng ngoài nội dung nào thường hữu ích trong lọc thư rác?","Thông tin header: địa chỉ gửi, domain, số đường link, tỉ lệ chữ in hoa, tệp đính kèm","Số lượng nơ-ron",["Độ dài từ vựng của mô hình","Learning rate"],"Kết hợp với blacklist/whitelist và chữ ký SPF/DKIM."],
+["2","H","Vì sao logistic regression được gọi là mô hình phân biệt (discriminative) trong khi NB là sinh (generative)?","LR mô hình hóa trực tiếp P(y|x); NB mô hình hóa P(x|y)P(y) tức phân phối kết hợp","LR sinh được văn bản mới",["NB không dùng xác suất","LR dùng định lý Bayes"],"Ng & Jordan (2002): NB hội tụ nhanh hơn với ít dữ liệu, LR thường tốt hơn khi nhiều dữ liệu."],
+["2","E","Confusion matrix cho phân lớp nhị phân gồm những ô nào?","TP, FP, FN, TN","Precision, Recall, F1, Accuracy",["Train, Dev, Test, Val","Uni, Bi, Tri, Four-gram"],"Từ đó suy ra mọi độ đo khác."],
+];
+const QX_B = [
+// ===== Bài 3 – mở rộng =====
+["3","E","Giả thuyết phân bố (distributional hypothesis) phát biểu điều gì?","Các từ xuất hiện trong ngữ cảnh tương tự thì có nghĩa tương tự ('You shall know a word by the company it keeps' – Firth)","Từ dài có nghĩa phức tạp hơn",["Từ hiếm quan trọng hơn từ phổ biến","Mỗi từ chỉ có một nghĩa"],"Là nền tảng lý thuyết của ma trận đồng xuất hiện, word2vec, GloVe."],
+["3","H","Negative sampling trong word2vec giải quyết vấn đề gì?","Tránh tính softmax trên toàn bộ từ vựng: chỉ phân biệt cặp (từ, ngữ cảnh) thật với một vài cặp nhiễu ngẫu nhiên bằng sigmoid","Tăng số từ ngữ cảnh",["Xử lý từ OOV","Mã hóa vị trí của từ"],"Chi phí mỗi bước từ O(|V|) xuống O(k), k thường 5–20."],
+["3","H","Trong word2vec, mẫu âm (negative samples) được lấy theo phân phối nào?","Phân phối unigram mũ 3/4: P(w) ∝ count(w)^0.75","Phân phối đều trên từ vựng",["Chỉ lấy stopwords","Phân phối unigram mũ 2"],"Mũ 0,75 tăng cơ hội cho từ hiếm so với unigram thuần."],
+["3","H","Hierarchical softmax trong word2vec hoạt động thế nào?","Tổ chức từ vựng thành cây nhị phân (Huffman), xác suất một từ là tích các quyết định nhị phân dọc đường đi → O(log|V|)","Chia từ vựng thành các đoạn bằng nhau",["Dùng nhiều softmax song song","Bỏ softmax hoàn toàn"],"Từ phổ biến có đường đi ngắn hơn trong cây Huffman."],
+["3","H","Subsampling từ phổ biến trong word2vec có tác dụng gì?","Bỏ ngẫu nhiên các từ rất phổ biến (the, a…) với xác suất cao hơn → tăng tốc và cải thiện vector của từ hiếm","Loại bỏ toàn bộ từ hiếm",["Tăng kích thước cửa sổ","Chuẩn hóa vector"],"Xác suất bỏ ≈ 1 − √(t / f(w)), t ~ 10⁻⁵."],
+["3","H","Kích thước cửa sổ ngữ cảnh ảnh hưởng đến embedding thế nào?","Cửa sổ nhỏ (2–3) nắm quan hệ cú pháp/chức năng; cửa sổ lớn (5–10) nắm quan hệ chủ đề/ngữ nghĩa rộng","Cửa sổ không ảnh hưởng",["Cửa sổ lớn luôn tốt hơn","Cửa sổ nhỏ làm vector dài hơn"],"Ví dụ cửa sổ nhỏ: 'Hogwarts' gần 'Sunnydale'; cửa sổ lớn: 'Hogwarts' gần 'Dumbledore'."],
+["3","E","Số chiều điển hình của vector word2vec/GloVe là bao nhiêu?","Khoảng 100–300","Bằng kích thước từ vựng (~100.000)",["2–3","Khoảng 10.000"],"Biểu diễn đặc (dense), ít chiều, khác one-hot thưa nhiều chiều."],
+["3","E","Phép tương tự (analogy) nổi tiếng với word2vec là gì?","vec(king) − vec(man) + vec(woman) ≈ vec(queen)","vec(king) + vec(queen) = vec(royal)",["vec(king) · vec(man) = 1","vec(man) = vec(woman)"],"Cho thấy các quan hệ (giới tính, thủ đô–quốc gia) tương ứng với hướng tuyến tính trong không gian vector."],
+["3","H","Đánh giá nội tại (intrinsic) và ngoại tại (extrinsic) word embedding khác nhau thế nào?","Nội tại: đánh giá trực tiếp trên tác vụ trung gian (tương đồng từ WordSim-353/SimLex-999, analogy); Ngoại tại: đo hiệu năng khi dùng embedding trong bài toán thực (NER, phân loại)","Nội tại cần GPU, ngoại tại không",["Hai cách cho kết quả luôn giống nhau","Ngoại tại chỉ đo tốc độ"],"Nội tại nhanh nhưng không phải lúc nào cũng tương quan với ngoại tại."],
+["3","H","Levy & Goldberg (2014) chỉ ra mối liên hệ gì giữa word2vec và phương pháp đếm?","Skip-gram với negative sampling tương đương ngầm phân tích ma trận PMI dịch chuyển (shifted PMI = PMI − log k)","Word2vec là một dạng Naive Bayes",["Word2vec tương đương TF-IDF","word2vec không liên quan đến thống kê đồng xuất hiện"],"Gắn kết hai trường phái 'predict' (word2vec) và 'count' (ma trận đồng xuất hiện/GloVe)."],
+["3","H","Hàm trọng số f(x) trong GloVe có dạng nào?","f(x) = (x/x_max)^α nếu x < x_max, ngược lại bằng 1; thường x_max = 100, α = 3/4","f(x) = log x",["f(x) = 1 với mọi x","f(x) = e^x"],"Giảm ảnh hưởng của cặp hiếm (nhiễu) và chặn trên cho cặp quá phổ biến."],
+["3","H","GloVe học hai bộ vector W và W̃. Vector cuối cùng thường lấy thế nào?","Tổng W + W̃ (hoặc trung bình)","Chỉ lấy W̃",["Tích W·W̃","Hiệu W − W̃"],"Hai bộ vector đối xứng về vai trò nên cộng lại giảm nhiễu."],
+["3","E","Word2vec gốc xử lý từ chưa gặp (OOV) như thế nào?","Không có vector cho từ OOV (thường thay bằng <UNK> hoặc vector 0)","Tự sinh vector từ ký tự",["Dùng vector của từ gần nhất theo chữ cái","Tra từ điển WordNet"],"FastText khắc phục nhờ n-gram ký tự."],
+["3","H","Vấn đề thiên kiến (bias) trong word embedding là gì?","Embedding học theo corpus nên phản ánh định kiến xã hội, vd. 'man : programmer :: woman : homemaker'","Embedding luôn trung lập",["Bias là tham số b của mạng","Bias chỉ xuất hiện ở one-hot"],"Bolukbasi et al. (2016) đề xuất phương pháp debiasing."],
+["3","E","Doc2Vec (Paragraph Vector) mở rộng word2vec thế nào?","Học thêm một vector cho mỗi đoạn/văn bản cùng với vector từ","Chỉ dùng ký tự",["Dùng Transformer","Không cần huấn luyện"],"Le & Mikolov (2014); có hai biến thể PV-DM và PV-DBOW."],
+["3","H","Sentence-BERT (SBERT) phù hợp cho phát hiện đạo văn/tìm câu tương tự vì sao?","Fine-tune BERT kiểu siamese để sinh vector câu so sánh bằng cosine, nhanh hơn nhiều so với đưa từng cặp câu qua BERT","Vì SBERT đếm n-gram",["Vì SBERT không cần GPU khi huấn luyện","Vì SBERT dùng one-hot"],"So sánh 10.000 câu bằng BERT cross-encoder cần ~50 triệu lượt suy luận; SBERT chỉ cần mã hóa mỗi câu một lần."],
+["3","H","Phương pháp phát hiện trùng lặp gần đúng (near-duplicate) quy mô lớn thường dùng là gì?","Shingling (k-gram) + độ đo Jaccard, xấp xỉ nhanh bằng MinHash và LSH","Huấn luyện LSTM cho mọi cặp văn bản",["So sánh độ dài file","Tính BLEU cho mọi cặp"],"MinHash ước lượng Jaccard; LSH gom các văn bản có khả năng giống nhau để tránh so sánh O(n²)."],
+["3","E","Độ tương tự Jaccard giữa hai tập A và B là gì?","|A ∩ B| / |A ∪ B|","|A| + |B|",["|A ∩ B| / |A|","|A − B|"],"Với văn bản, A và B là tập các shingle/n-gram."],
+["3","H","Đạo văn xuyên ngôn ngữ (dịch rồi chép) có thể phát hiện bằng cách nào?","Dùng embedding đa ngôn ngữ (vd. LaBSE, mBERT, XLM-R) đưa câu hai ngôn ngữ vào cùng không gian rồi so cosine","Đếm từ trùng nhau trực tiếp",["Chỉ so sánh tiêu đề","Dùng TF-IDF trên từng ngôn ngữ riêng"],"Phương pháp dựa trên trùng n-gram thất bại vì từ vựng khác ngôn ngữ."],
+["3","E","Vì sao cosine similarity được ưa dùng hơn khoảng cách Euclid cho word embedding?","Cosine chỉ xét hướng, ít bị ảnh hưởng bởi độ dài vector (liên quan tần suất từ)","Cosine nhanh hơn gấp 100 lần",["Euclid không tính được cho vector thực","Cosine luôn dương"],"Với vector đã chuẩn hóa L2, hai độ đo cho cùng thứ hạng."],
+["3","H","ELMo đạt cải thiện lớn trên các bài toán nhờ cơ chế nào khi áp dụng downstream?","Học tổ hợp tuyến tính có trọng số (softmax-normalized) các tầng biLM riêng cho từng bài toán, kèm hệ số γ","Fine-tune toàn bộ mạng như BERT",["Chỉ dùng tầng ký tự","Thay embedding bằng one-hot"],"Các tầng thấp nắm cú pháp, tầng cao nắm ngữ nghĩa phụ thuộc ngữ cảnh."],
+["3","E","PhoW2V là gì?","Bộ word2vec tiền huấn luyện cho tiếng Việt (mức âm tiết và mức từ) của VinAI","Mô hình dịch Việt–Anh",["Bộ tách từ tiếng Việt","Phiên bản tiếng Việt của BLEU"],"Huấn luyện trên corpus tiếng Việt lớn (~20GB)."],
+["3","H","Vì sao embedding tĩnh (word2vec) gặp khó với từ đa nghĩa như 'bank' hoặc 'đường' (đường đi / đường ăn)?","Mỗi từ chỉ có một vector, là trung bình các nghĩa, nên không phân biệt được nghĩa theo ngữ cảnh","Vì từ đa nghĩa không xuất hiện trong corpus",["Vì vector quá ngắn","Vì word2vec bỏ qua danh từ"],"Embedding ngữ cảnh (ELMo, BERT) giải quyết vấn đề này."],
+["3","H","Trong skip-gram, với cửa sổ c = 2, một câu 5 từ (không đệm) sinh ra bao nhiêu cặp huấn luyện (tâm, ngữ cảnh)?","14","10",["20","8"],"Số ngữ cảnh mỗi vị trí: 2, 3, 4, 3, 2 → tổng 14."],
+["3","E","Mean pooling vector từ để tạo vector câu có nhược điểm gì?","Mất thông tin thứ tự từ và có thể bị chi phối bởi từ phổ biến","Không tính được cho câu dài",["Vector có số chiều bằng từ vựng","Luôn cho kết quả sai"],"Cải thiện bằng trọng số TF-IDF/SIF hoặc dùng bộ mã hóa câu (SBERT)."],
+["3","H","Character-level CNN trong ELMo xử lý một từ như thế nào?","Nhúng từng ký tự, áp dụng các bộ lọc tích chập có độ rộng khác nhau, max-pooling rồi qua highway layers để ra vector từ","Tách từ thành n-gram rồi cộng như FastText",["Tra bảng embedding từ","Dùng one-hot ký tự rồi nối"],"Giúp ELMo có vector cho mọi từ, kể cả OOV."],
+["3","E","t-SNE và PCA được dùng với word embedding để làm gì?","Giảm chiều để trực quan hóa vector từ trên mặt phẳng 2D/3D","Huấn luyện embedding",["Tách từ","Đánh giá BLEU"],"Đề cương: tự học 'trực quan hóa, phân tích một số mô hình biểu diễn từ có sẵn'."],
+["3","H","Gensim là gì và thường dùng để làm gì?","Thư viện Python để huấn luyện/nạp word2vec, FastText, Doc2Vec, LDA","Thư viện dịch máy",["Framework mạng nơ-ron tổng quát","Bộ dữ liệu đạo văn"],"Ví dụ: gensim.models.Word2Vec(sentences, vector_size=100, window=5, sg=1)."],
+
+// ===== Bài 4 – mở rộng =====
+["4","E","Vấn đề bùng nổ gradient (exploding gradient) trong RNN thường xử lý bằng cách nào?","Gradient clipping – cắt chuẩn gradient khi vượt ngưỡng","Thêm cổng quên",["Tăng learning rate","Bỏ hàm kích hoạt"],"Vanishing gradient thì cần thay đổi kiến trúc (LSTM/GRU, residual)."],
+["4","E","BPTT là gì?","Backpropagation Through Time – lan truyền ngược qua mạng RNN được 'trải' theo thời gian","Beam search cho RNN",["Một loại cổng trong LSTM","Thuật toán tách từ"],"Truncated BPTT chỉ lan truyền ngược trong k bước để tiết kiệm bộ nhớ."],
+["4","H","Công thức trạng thái ẩn của GRU là gì?","h_t = (1 − z_t) ⊙ h_{t−1} + z_t ⊙ h̃_t, với h̃_t = tanh(W·[r_t ⊙ h_{t−1}, x_t])","h_t = o_t ⊙ tanh(C_t)",["h_t = f_t ⊙ h_{t−1} + i_t ⊙ C̃_t","h_t = σ(W·x_t)"],"z_t: cổng cập nhật; r_t: cổng reset quyết định dùng bao nhiêu trạng thái cũ khi tính ứng viên."],
+["4","H","Số tham số của một tầng LSTM với đầu vào d và trạng thái ẩn h là bao nhiêu (có bias)?","4·(h·(h + d) + h)","h·(h + d) + h",["3·(h·(h + d) + h)","4·h·d"],"4 khối (3 cổng + ứng viên), mỗi khối có W ∈ R^{h×(h+d)} và bias h. GRU có 3 khối."],
+["4","H","Vì sao thường đặt CRF lên trên Bi-LSTM cho NER (Bi-LSTM-CRF)?","CRF mô hình hóa phụ thuộc giữa các nhãn kề nhau (vd. I-PER không thể theo sau B-LOC), giải mã chuỗi nhãn tối ưu toàn cục","CRF giúp tăng tốc huấn luyện",["CRF thay thế embedding","CRF loại bỏ vanishing gradient"],"Softmax độc lập từng token có thể sinh chuỗi nhãn không hợp lệ."],
+["4","H","Thuật toán nào dùng để tìm chuỗi nhãn tốt nhất trong CRF/HMM?","Viterbi (quy hoạch động)","Beam search ngẫu nhiên",["K-means","Gradient descent"],"Độ phức tạp O(n·K²), n độ dài chuỗi, K số nhãn."],
+["4","E","Perplexity của mô hình ngôn ngữ là gì?","PP(W) = P(w1…wN)^(−1/N) = exp(cross-entropy); càng thấp càng tốt","Xác suất câu dài nhất",["Số từ trong từ vựng","Độ chính xác dự đoán nhãn"],"Có thể hiểu là 'số lựa chọn trung bình' mô hình phân vân tại mỗi bước."],
+["4","E","Giả định Markov trong mô hình n-gram là gì?","Xác suất từ hiện tại chỉ phụ thuộc vào n−1 từ trước đó","Mọi từ độc lập nhau",["Từ hiện tại phụ thuộc toàn bộ câu","Từ hiện tại phụ thuộc từ phía sau"],"Bi-gram: P(wi | wi−1). RNN/LSTM bỏ được giới hạn cửa sổ cố định này."],
+["4","H","Ưu điểm chính của mô hình ngôn ngữ RNN so với n-gram là gì?","Về lý thuyết điều kiện trên toàn bộ lịch sử, chia sẻ tham số qua các bước, không bùng nổ số tham số theo n và tổng quát hóa qua embedding","RNN không cần huấn luyện",["RNN luôn nhanh hơn n-gram","RNN không bị vấn đề dữ liệu thưa vì đếm chính xác"],"n-gram cần làm mịn (Kneser-Ney) để xử lý n-gram chưa gặp."],
+["4","E","Stacked (multi-layer) LSTM là gì?","Xếp nhiều tầng LSTM, đầu ra chuỗi của tầng dưới là đầu vào của tầng trên","Nối nhiều LSTM theo chiều ngang thành câu dài",["LSTM có nhiều cổng quên","Huấn luyện nhiều LSTM rồi bỏ phiếu"],"Tăng khả năng biểu diễn; seq2seq của Sutskever dùng 4 tầng."],
+["4","H","Khi huấn luyện RNN theo batch với câu khác độ dài, cần xử lý gì?","Đệm (padding) đến cùng độ dài và dùng mask/packed sequence để bỏ qua vị trí đệm khi tính trạng thái và loss","Cắt mọi câu về 1 từ",["Không cần xử lý gì","Chỉ huấn luyện batch size 1"],"PyTorch: pack_padded_sequence; loss dùng ignore_index cho token đệm."],
+["4","E","Các dạng bài toán của RNN theo quan hệ đầu vào–đầu ra gồm?","Many-to-one (phân loại câu), many-to-many cùng độ dài (gán nhãn chuỗi), many-to-many khác độ dài (seq2seq), one-to-many (sinh chú thích ảnh)","Chỉ many-to-one",["One-to-one là duy nhất","Chỉ dùng cho chuỗi thời gian số"],"Theo phân loại phổ biến của Karpathy."],
+["4","H","Vì sao trong LSTM, khởi tạo bias cổng quên bằng giá trị dương (vd. 1) là thủ thuật hữu ích?","Để f_t ≈ 1 ở đầu huấn luyện, giữ thông tin cell state và gradient lan truyền tốt","Để LSTM quên mọi thứ ngay từ đầu",["Để giảm số tham số","Để thay thế cổng ra"],"Jozefowicz et al. (2015)."],
+["4","H","Đánh giá NER thường dùng độ đo nào?","F1 mức thực thể (entity-level): thực thể chỉ đúng khi khớp cả ranh giới và loại","Accuracy mức token",["BLEU","Perplexity"],"Accuracy token bị thổi phồng vì đa số token là O. Thư viện seqeval cài đặt chuẩn CoNLL."],
+["4","E","Lược đồ BIOES (BILOU) mở rộng BIO thế nào?","Thêm E (End – token cuối thực thể) và S (Single – thực thể một token)","Thêm nhãn cho từ loại",["Bỏ nhãn O","Thêm nhãn cho câu"],"Ranh giới rõ hơn, đôi khi cải thiện NER."],
+["4","E","Bộ dữ liệu NER tiếng Việt phổ biến là gì?","VLSP 2016/2018 NER (và PhoNER_COVID19)","CoNLL 2003",["SQuAD","GLUE"],"CoNLL 2003 là cho tiếng Anh/Đức."],
+["4","H","Teacher forcing khi huấn luyện mô hình ngôn ngữ/seq2seq RNN là gì?","Dùng token đúng của bước trước (ground truth) làm đầu vào cho bước hiện tại thay vì token mô hình dự đoán","Dùng giáo viên gán nhãn thủ công từng bước",["Ép gradient bằng 0","Dùng beam search khi huấn luyện"],"Giúp huấn luyện nhanh, ổn định nhưng gây exposure bias khi suy luận."],
+["4","E","Dropout trong RNN thường áp dụng ở đâu để tránh phá vỡ bộ nhớ?","Giữa các tầng (kết nối không hồi quy) hoặc variational dropout dùng cùng mặt nạ qua các bước thời gian","Trực tiếp lên cell state mỗi bước với mặt nạ mới",["Lên nhãn đầu ra","Không bao giờ dùng dropout trong RNN"],"Zaremba et al. (2014); Gal & Ghahramani (2016)."],
+["4","H","Hạn chế của RNN/LSTM so với Transformer khi huấn luyện trên GPU là gì?","Tính toán tuần tự theo thời gian nên khó song song hóa trên độ dài chuỗi","RNN có quá nhiều tham số",["RNN không học được ngôn ngữ","RNN cần positional encoding"],"Transformer xử lý toàn chuỗi song song bằng phép nhân ma trận."],
+["4","H","Để gán nhãn chuỗi bằng LSTM cho tiếng Việt, đầu vào nên ở mức nào?","Thường tách từ trước (mức từ) hoặc dùng mức âm tiết kèm đặc trưng ký tự; lựa chọn ảnh hưởng ranh giới thực thể","Chỉ mức câu",["Chỉ mức đoạn văn","Mức byte bắt buộc"],"Ví dụ 'Hà_Nội' là một từ gồm hai âm tiết."],
+["4","E","Hàm kích hoạt tanh trong RNN có miền giá trị nào?","(−1, 1)","(0, 1)",["[0, ∞)","(−∞, ∞)"],"Đạo hàm tanh ≤ 1 → nhân nhiều lần gây vanishing gradient."],
+["4","H","Peephole connection trong LSTM là gì?","Cho các cổng 'nhìn' trực tiếp vào cell state C_{t−1} (hoặc C_t) khi tính giá trị cổng","Kết nối từ đầu ra về đầu vào embedding",["Bỏ cổng ra","Thêm attention"],"Biến thể của Gers & Schmidhuber (2000)."],
+["4","H","Hai cách lấy biểu diễn câu từ Bi-LSTM cho phân loại là gì và khác nhau thế nào?","Nối trạng thái cuối của chiều xuôi và đầu của chiều ngược, hoặc pooling (mean/max/attention) trên mọi bước","Chỉ dùng embedding từ đầu",["Dùng TF-IDF của câu","Lấy trạng thái ở giữa câu"],"Pooling thường ổn định hơn với câu dài; attention pooling cho trọng số học được."],
+["4","E","CNN 1D có thể dùng cho phân loại văn bản không?","Có – tích chập trên chuỗi embedding bắt n-gram cục bộ, rồi max-pooling (Kim, 2014)","Không, CNN chỉ dùng cho ảnh",["Chỉ khi văn bản dưới 5 từ","Chỉ cho tiếng Anh"],"Thường nhanh và hiệu quả cho phân loại câu ngắn."],
+];
+const QX_C = [
+// ===== Bài 5 – mở rộng =====
+["5","E","Attention của Bahdanau (2015) và Luong (2015) khác nhau chủ yếu ở đâu?","Bahdanau dùng điểm cộng (additive, mạng MLP với tanh); Luong dùng điểm nhân (dot/general/concat), tính attention từ trạng thái decoder hiện tại","Bahdanau dùng softmax, Luong không",["Luong chỉ dùng cho phân loại","Hai cách hoàn toàn giống nhau"],"Bahdanau: e = vᵀ tanh(W1 h_i + W2 s_{t−1}); Luong general: e = s_tᵀ W h_i."],
+["5","H","Các hàm tính điểm attention phổ biến gồm?","Dot: sᵀh; General (multiplicative): sᵀWh; Additive: vᵀtanh(W1 s + W2 h)","Cosine, Euclid, Manhattan",["BLEU, ROUGE, METEOR","ReLU, GELU, SiLU"],"Dot nhanh nhưng yêu cầu cùng số chiều; additive linh hoạt hơn."],
+["5","H","Exposure bias trong seq2seq là gì?","Khi huấn luyện, decoder luôn nhận token đúng (teacher forcing); khi suy luận lại nhận token tự sinh, nên lỗi tích lũy vì mô hình chưa từng gặp đầu vào sai","Mô hình bị thiên về câu dài",["Mô hình chỉ học từ phổ biến","Encoder nhìn thấy dữ liệu test"],"Giảm bằng scheduled sampling, huấn luyện dựa trên chuỗi (sequence-level)."],
+["5","H","Scheduled sampling là gì?","Trong huấn luyện, dần dần thay token đúng bằng token mô hình tự dự đoán với xác suất tăng theo thời gian","Lịch giảm learning rate",["Chọn ngẫu nhiên câu huấn luyện","Lấy mẫu beam size"],"Bengio et al. (2015) – giảm exposure bias."],
+["5","E","NMT hiện đại xử lý từ ngoài từ điển (OOV) chủ yếu bằng cách nào?","Dùng đơn vị subword (BPE, SentencePiece) để từ lạ được phân rã thành các mảnh đã biết","Bỏ qua từ lạ",["Dịch từ lạ thành <UNK> luôn","Tra Google"],"Sennrich et al. (2016)."],
+["5","E","ROUGE thường dùng để đánh giá bài toán nào?","Tóm tắt văn bản (dựa trên recall n-gram/chuỗi con chung dài nhất với bản tóm tắt tham chiếu)","Phân loại cảm xúc",["Nhận dạng thực thể","Tách từ"],"ROUGE-1, ROUGE-2 (n-gram), ROUGE-L (LCS)."],
+["5","H","BLEU kết hợp precision các n-gram như thế nào?","Trung bình nhân (geometric mean) của p1…p4 nhân với brevity penalty: BLEU = BP · exp(Σ wn log pn)","Trung bình cộng p1…p4",["Chỉ dùng p4","Tổng p1…p4"],"Nếu một pn = 0 thì BLEU = 0 (với câu đơn cần smoothing)."],
+["5","H","Brevity penalty trong BLEU được tính thế nào (c: độ dài bản dịch, r: độ dài tham chiếu)?","BP = 1 nếu c > r, ngược lại BP = exp(1 − r/c)","BP = c / r luôn",["BP = exp(c − r)","BP = 0 nếu c < r"],"Phạt bản dịch quá ngắn, vì precision n-gram không phạt việc bỏ sót."],
+["5","H","Precision n-gram trong BLEU là 'modified/clipped precision' nghĩa là gì?","Số lần đếm một n-gram được cắt tối đa bằng số lần nó xuất hiện trong bản tham chiếu","n-gram chỉ tính nếu dài hơn 4",["Precision chia cho độ dài câu","Precision chỉ tính stopwords"],"Tránh bản dịch 'the the the the' đạt precision 1."],
+["5","E","Các độ đo dịch máy hiện đại dựa trên mô hình học sâu là gì?","COMET, BERTScore (so sánh ngữ nghĩa bằng embedding/mô hình huấn luyện theo đánh giá người)","BLEU, ROUGE",["Perplexity, Accuracy","TF-IDF, BM25"],"Tương quan với đánh giá người tốt hơn BLEU. chrF dựa trên n-gram ký tự."],
+["5","E","Temperature trong lấy mẫu (sampling) khi sinh văn bản có tác dụng gì?","Chia logits cho T: T < 1 làm phân phối nhọn hơn (ít ngẫu nhiên), T > 1 phẳng hơn (đa dạng hơn)","Tăng tốc giải mã",["Thay đổi độ dài câu tối đa","Điều chỉnh beam size"],"T → 0 tương đương greedy."],
+["5","H","Top-k và top-p (nucleus) sampling khác nhau thế nào?","Top-k lấy mẫu trong k token xác suất cao nhất; top-p lấy mẫu trong tập nhỏ nhất có tổng xác suất ≥ p (kích thước thay đổi theo ngữ cảnh)","Top-p luôn chọn đúng p token",["Top-k là beam search","Hai cách giống nhau"],"Nucleus sampling – Holtzman et al. (2020)."],
+["5","H","Vì sao beam search thường không phù hợp cho sinh văn bản mở (open-ended) như kể chuyện?","Beam search tìm chuỗi xác suất cao nên dễ sinh văn bản lặp lại, nhàm chán; sampling cho văn bản đa dạng tự nhiên hơn","Beam search quá chậm cho mọi bài toán",["Beam search không dùng được với Transformer","Beam search luôn sinh câu quá dài"],"Với dịch máy/tóm tắt (có đáp án tương đối xác định), beam search vẫn tốt."],
+["5","H","Pointer-generator network (See et al., 2017) bổ sung gì cho seq2seq tóm tắt?","Cơ chế sao chép (copy) từ trực tiếp từ văn bản nguồn qua phân phối attention, kết hợp với sinh từ từ vựng; kèm coverage để giảm lặp","Bỏ encoder",["Thay attention bằng CNN","Dùng beam size 1"],"Giải quyết OOV (tên riêng, số) và lặp lại trong tóm tắt."],
+["5","H","Coverage mechanism trong NMT/tóm tắt nhằm giải quyết vấn đề gì?","Dịch/tóm tắt lặp lại hoặc bỏ sót phần nguồn – theo dõi tổng attention đã dồn vào mỗi vị trí nguồn","Từ OOV",["Câu quá ngắn","Vanishing gradient trong encoder"],"Tu et al. (2016)."],
+["5","E","Back-translation là kỹ thuật gì?","Dịch văn bản đơn ngữ ở ngôn ngữ đích ngược về ngôn ngữ nguồn bằng mô hình ngược để tạo thêm dữ liệu song ngữ giả","Dịch hai lần để kiểm tra lỗi",["Đảo ngược câu nguồn","Dịch từ cuối câu lên đầu"],"Sennrich et al. (2016) – hiệu quả cho cặp ngôn ngữ ít dữ liệu."],
+["5","H","Sutskever et al. (2014) phát hiện thủ thuật nào cải thiện seq2seq LSTM?","Đảo ngược thứ tự câu nguồn để các từ đầu câu nguồn gần các từ đầu câu đích, tạo phụ thuộc ngắn","Dùng CNN thay LSTM",["Bỏ decoder","Dùng beam size 100"],"Ngoài ra dùng LSTM sâu 4 tầng."],
+["5","H","Vì sao encoder trong seq2seq có attention thường là Bi-RNN?","Mỗi trạng thái ẩn h_i tóm tắt cả ngữ cảnh trái và phải quanh từ thứ i, làm 'annotation' tốt hơn cho attention","Để decoder nhanh hơn",["Để không cần attention","Vì RNN một chiều không huấn luyện được"],"Bahdanau et al. (2015) nối trạng thái xuôi và ngược."],
+["5","E","Hard attention khác soft attention thế nào?","Hard chọn một vị trí (rời rạc, không khả vi, cần RL/sampling); soft lấy trung bình có trọng số mọi vị trí (khả vi, huấn luyện bằng backprop)","Hard attention dùng softmax, soft thì không",["Hai cách là một","Soft attention chỉ cho ảnh"],"Xu et al. (2015) – Show, Attend and Tell."],
+["5","H","Global và local attention (Luong 2015) khác nhau thế nào?","Global chú ý mọi vị trí nguồn; local chỉ chú ý một cửa sổ quanh vị trí căn chỉnh dự đoán p_t → rẻ hơn với câu dài","Local chú ý câu khác",["Global chỉ dùng trạng thái cuối","Local không dùng softmax"],"Ý tưởng tương tự xuất hiện lại ở sparse/sliding window attention."],
+["5","E","Mô hình dịch đa ngôn ngữ (multilingual NMT) của Google (2017) chỉ định ngôn ngữ đích như thế nào?","Thêm một token đặc biệt (vd. <2es>) vào đầu câu nguồn","Huấn luyện riêng mỗi cặp",["Dùng từ điển song ngữ","Đổi kiến trúc decoder"],"Cho phép dịch zero-shot giữa cặp chưa thấy khi huấn luyện."],
+["5","H","Hiện tượng 'beam search curse' trong NMT là gì?","Tăng beam size quá lớn lại làm giảm chất lượng, thường sinh câu quá ngắn (hoặc rỗng) vì xác suất cao","Beam lớn luôn tốt hơn",["Beam lớn làm câu quá dài","Beam lớn gây vanishing gradient"],"Lý do thêm length normalization/penalty."],
+["5","E","Length penalty trong Google NMT có dạng nào?","Chia log-prob cho lp(Y) = ((5 + |Y|)^α) / (6^α), α thường 0,6–0,7","Nhân log-prob với độ dài",["Cộng 1 cho mỗi từ","Bỏ các câu dưới 5 từ"],"Wu et al. (2016) – cải tiến của chuẩn hóa chia cho độ dài."],
+["5","H","Seq2seq có attention có thể dùng cho nhận dạng giọng nói (ASR) không?","Có – 'Listen, Attend and Spell' dùng encoder trên đặc trưng âm thanh và decoder có attention sinh ký tự","Không, chỉ dùng cho văn bản",["Chỉ khi không có attention","Chỉ cho tiếng Anh"],"Chan et al. (2016)."],
+["5","E","Dịch máy tiếng Việt: bộ dữ liệu song ngữ Anh–Việt lớn công khai nào gần đây?","PhoMT (VinAI, ~3 triệu cặp câu)","SQuAD",["CoNLL 2003","Enron"],"Trước đó có IWSLT'15 En–Vi (~133k cặp)."],
+
+// ===== Bài 6.1 – mở rộng =====
+["6.1","H","Vì sao chia cho √d_k trong scaled dot-product attention?","Nếu q, k có thành phần độc lập phương sai 1 thì q·k có phương sai d_k; chia √d_k đưa về phương sai 1, tránh softmax bão hòa và gradient nhỏ","Để tổng trọng số bằng 1",["Để giảm số head","Để mã hóa vị trí"],"Vaswani et al. (2017), mục 3.2.1."],
+["6.1","E","Cấu hình Transformer-base trong bài báo gốc là gì?","6 tầng encoder + 6 tầng decoder, d_model = 512, 8 head, d_ff = 2048","12 tầng, d_model = 768, 12 head",["24 tầng, d_model = 1024, 16 head","2 tầng, d_model = 256, 4 head"],"Transformer-big: d_model 1024, 16 head, d_ff 4096."],
+["6.1","H","Trong Transformer-base, mỗi head có số chiều d_k bằng bao nhiêu?","64 (= 512 / 8)","512",["8","128"],"Chia d_model cho số head → tổng chi phí tương đương một head đầy đủ chiều."],
+["6.1","H","Số tham số xấp xỉ của một khối self-attention (bỏ bias) với d_model = d là bao nhiêu?","4d² (W_Q, W_K, W_V, W_O mỗi cái d×d)","d²",["3d","h·d²"],"FFN với d_ff = 4d có ≈ 8d² tham số → FFN chiếm khoảng 2/3 tham số mỗi tầng."],
+["6.1","E","Các kỹ thuật regularization dùng trong Transformer gốc là gì?","Dropout (0,1) trên đầu ra sublayer và embedding, label smoothing (ε = 0,1)","L1 regularization",["Early stopping duy nhất","Batch normalization"],"Label smoothing làm tăng perplexity nhưng cải thiện BLEU."],
+["6.1","H","Siêu tham số Adam trong bài báo Transformer gốc là gì?","β1 = 0,9; β2 = 0,98; ε = 10⁻⁹; warmup_steps = 4000","β1 = 0,5; β2 = 0,5",["β1 = 0,99; β2 = 0,999; không warmup","Dùng SGD momentum 0,9"],"β2 = 0,98 (thấp hơn mặc định 0,999) giúp ổn định với Transformer."],
+["6.1","E","Masked (causal) attention thường được cài đặt như thế nào?","Cộng −∞ vào điểm attention của các vị trí tương lai (ma trận tam giác trên) trước softmax","Đặt trọng số tương lai bằng 1",["Xóa token tương lai khỏi đầu vào","Nhân điểm với 0 sau softmax mà không chuẩn hóa lại"],"Sau softmax, các vị trí đó có trọng số 0."],
+["6.1","E","Padding mask trong attention dùng để làm gì?","Ngăn các token chú ý vào vị trí đệm [PAD] trong batch","Che token tương lai",["Che 15% token","Chuẩn hóa đầu ra"],"Thường kết hợp với causal mask ở decoder."],
+["6.1","H","KV cache khi suy luận với decoder Transformer là gì?","Lưu key và value của các token đã sinh để mỗi bước mới chỉ tính Q, K, V cho token mới, tránh tính lại","Lưu trọng số mô hình trên đĩa",["Bộ nhớ đệm cho embedding đầu vào","Lưu lịch sử gradient"],"Giảm chi phí mỗi bước nhưng bộ nhớ tăng tuyến tính theo độ dài ngữ cảnh."],
+["6.1","H","Multi-Query Attention (MQA) và Grouped-Query Attention (GQA) nhằm mục đích gì?","Cho nhiều head query dùng chung (một hoặc một nhóm) head key/value để giảm kích thước KV cache và tăng tốc suy luận","Tăng số tham số",["Thay thế FFN","Bỏ softmax"],"LLaMA-2 70B, Mistral dùng GQA."],
+["6.1","H","FlashAttention cải thiện attention bằng cách nào?","Tính attention theo khối (tiling) trong SRAM, giảm đọc/ghi bộ nhớ HBM, cho kết quả chính xác (không xấp xỉ) và tiết kiệm bộ nhớ","Xấp xỉ attention bằng hạng thấp",["Giảm số head","Bỏ softmax"],"Dao et al. (2022) – tối ưu IO-aware."],
+["6.1","H","ALiBi (Attention with Linear Biases) mã hóa vị trí thế nào?","Không thêm embedding vị trí; cộng vào điểm attention một độ lệch âm tỉ lệ với khoảng cách giữa query và key (mỗi head một độ dốc)","Cộng sin/cos vào embedding",["Xoay vector q, k","Dùng embedding học được"],"Press et al. (2022) – ngoại suy tốt cho chuỗi dài hơn khi huấn luyện."],
+["6.1","H","SwiGLU (dùng trong LLaMA, PaLM) là gì?","Biến thể FFN có cổng: FFN(x) = (Swish(xW1) ⊙ xV)W2","Hàm mất mát mới",["Một loại positional encoding","Optimizer thay AdamW"],"Shazeer (2020) – GLU variants cải thiện chất lượng."],
+["6.1","E","GELU là hàm kích hoạt dùng trong mô hình nào?","BERT, GPT-2/3 (FFN)","Transformer gốc Vaswani",["LSTM","Naive Bayes"],"GELU(x) = x·Φ(x), Φ là CDF phân phối chuẩn; mượt hơn ReLU."],
+["6.1","H","Weight tying trong Transformer là gì?","Dùng chung ma trận embedding đầu vào, embedding đầu ra decoder và ma trận chiếu trước softmax","Dùng chung trọng số giữa các head",["Chia sẻ tham số giữa mọi tầng","Khóa trọng số không cho cập nhật"],"Giảm tham số; Vaswani nhân embedding với √d_model."],
+["6.1","E","SentencePiece khác BPE/WordPiece truyền thống ở điểm nào?","Xử lý văn bản thô như chuỗi ký tự (kể cả khoảng trắng, ký hiệu ▁), không cần tách từ trước – phù hợp đa ngôn ngữ","Chỉ dùng cho tiếng Anh",["Không tạo subword","Dùng từ điển do người viết"],"Hỗ trợ cả BPE và unigram LM; dùng trong T5, LLaMA, XLM-R."],
+["6.1","H","Độ phức tạp bộ nhớ của ma trận attention cho chuỗi n token, h head là bao nhiêu?","O(h·n²)","O(n)",["O(h·n)","O(log n)"],"Lý do các mô hình gốc giới hạn 512–2048 token; hướng giải: sparse/linear attention, FlashAttention."],
+["6.1","H","Linear attention (Performer, Linformer…) giảm độ phức tạp thế nào?","Xấp xỉ softmax bằng kernel hoặc chiếu K,V xuống hạng thấp để tính trong O(n) thay vì O(n²)","Bỏ hoàn toàn query",["Chỉ dùng 1 head","Giảm số tầng"],"Đổi lại thường kém chính xác hơn attention đầy đủ."],
+["6.1","E","Mixture of Experts (MoE) trong Transformer là gì?","Thay FFN bằng nhiều 'chuyên gia' FFN, bộ định tuyến chọn vài chuyên gia cho mỗi token → tăng tham số mà không tăng nhiều tính toán","Kết hợp nhiều mô hình bằng bỏ phiếu",["Dùng nhiều optimizer","Huấn luyện nhiều lần rồi lấy trung bình"],"Ví dụ Switch Transformer, Mixtral 8×7B."],
+["6.1","E","Vision Transformer (ViT) áp dụng Transformer cho ảnh thế nào?","Chia ảnh thành các patch (vd. 16×16), chiếu tuyến tính mỗi patch thành token, thêm positional embedding và [CLS]","Dùng LSTM đọc từng pixel",["Biến ảnh thành văn bản mô tả","Dùng CNN rồi bỏ attention"],"Dosovitskiy et al. (2021) – 'An Image is Worth 16x16 Words'."],
+["6.1","H","Trong encoder–decoder Transformer khi suy luận, đầu ra encoder được dùng như thế nào?","Tính một lần, rồi dùng làm key/value cho cross-attention ở mọi bước giải mã","Tính lại ở mỗi bước giải mã",["Chỉ dùng ở bước đầu","Cộng vào embedding đầu ra"],"Decoder sinh từng token tự hồi quy."],
+["6.1","H","Vì sao Transformer cần warmup learning rate (đặc biệt với Post-LN)?","Gradient ở các tầng gần đầu ra rất lớn lúc đầu huấn luyện; LR lớn ngay từ đầu gây phân kỳ","Để tiết kiệm bộ nhớ",["Vì Adam không hoạt động khi LR nhỏ","Vì positional encoding cần thời gian học"],"Xiong et al. (2020): Pre-LN giảm (thậm chí bỏ được) nhu cầu warmup."],
+["6.1","E","Mô hình T5 (Text-to-Text Transfer Transformer) có ý tưởng gì?","Đưa mọi bài toán NLP về dạng văn bản → văn bản với tiền tố tác vụ (vd. 'translate English to German: …')","Chỉ dùng encoder",["Chỉ làm phân loại","Dùng LSTM"],"Raffel et al. (2020); tiền huấn luyện bằng span corruption trên C4."],
+["6.1","H","Hiện tượng 'attention sink' hoặc trọng số attention dồn vào token đầu tiên/[SEP] cho thấy điều gì về diễn giải attention?","Trọng số attention cao không nhất thiết là giải thích về tầm quan trọng; attention ≠ explanation","Mô hình bị lỗi huấn luyện",["Token đầu luôn quan trọng nhất về ngữ nghĩa","Cần bỏ softmax"],"Jain & Wallace (2019) 'Attention is not Explanation'; Clark et al. (2019) phân tích BERT."],
+["6.1","E","Mô hình decoder-only (GPT) dùng loại attention nào?","Masked (causal) self-attention, không có cross-attention","Cross-attention với encoder",["Self-attention hai chiều không mask","Không dùng attention"],"Mỗi token chỉ nhìn các token trước nó."],
+
+// ===== Bài 6.2 – mở rộng =====
+["6.2","E","RoBERTa thay đổi cách che token so với BERT thế nào?","Dynamic masking – sinh mặt nạ mới mỗi lần đưa câu vào mô hình thay vì cố định từ bước tiền xử lý","Che 50% token",["Không che token nào","Chỉ che danh từ"],"Liu et al. (2019); kèm batch lớn hơn, dữ liệu 160GB, byte-level BPE 50k."],
+["6.2","H","ALBERT dùng những kỹ thuật nào để giảm tham số?","Phân rã ma trận embedding (factorized embedding, E ≪ H) và chia sẻ tham số giữa các tầng; thay NSP bằng SOP","Chưng cất tri thức",["Lượng tử hóa 4-bit","Bỏ attention"],"SOP (Sentence Order Prediction): dự đoán hai đoạn liền kề có bị đảo thứ tự không."],
+["6.2","H","Sentence Order Prediction (SOP) của ALBERT khó hơn NSP vì sao?","Cả hai đoạn đều cùng chủ đề (lấy từ cùng văn bản, chỉ đảo thứ tự), nên mô hình phải học tính mạch lạc chứ không chỉ dựa vào chủ đề","SOP dùng 3 câu",["SOP cần nhãn thủ công","SOP dự đoán từ bị che"],"NSP dễ vì đoạn ngẫu nhiên thường khác chủ đề."],
+["6.2","H","ELECTRA huấn luyện theo cơ chế nào?","Replaced Token Detection: một generator nhỏ (MLM) thay một số token, discriminator dự đoán từng token là gốc hay bị thay thế","Dự đoán câu tiếp theo",["Dịch ngược","Che toàn bộ câu"],"Tín hiệu học trên 100% token → hiệu quả tính toán cao. Clark et al. (2020)."],
+["6.2","E","SpanBERT khác BERT ở điểm nào?","Che các đoạn (span) liên tiếp và thêm mục tiêu dự đoán span từ hai token biên (SBO); bỏ NSP","Che từng ký tự",["Dùng decoder","Huấn luyện đa ngôn ngữ"],"Joshi et al. (2020) – tốt cho QA trích xuất, coreference."],
+["6.2","E","DeBERTa cải tiến BERT bằng gì?","Disentangled attention: tách vector nội dung và vị trí (tương đối), cùng enhanced mask decoder","Bỏ positional encoding",["Dùng LSTM","Tăng kích thước từ vựng lên 1 triệu"],"He et al. (2021) – từng vượt baseline người trên SuperGLUE."],
+["6.2","E","XLM-R là gì?","Mô hình kiểu RoBERTa đa ngôn ngữ, huấn luyện trên ~2,5TB CommonCrawl của 100 ngôn ngữ","Mô hình dịch máy encoder–decoder",["BERT chỉ tiếng Anh","Mô hình sinh ảnh"],"Conneau et al. (2020); thường mạnh hơn mBERT, kể cả tiếng Việt."],
+["6.2","E","PhoBERT là gì?","Mô hình tiền huấn luyện đơn ngữ tiếng Việt (VinAI, 2020) theo kiến trúc RoBERTa, huấn luyện trên ~20GB văn bản","Bộ tách từ tiếng Việt",["Mô hình dịch Anh–Việt","Bản tiếng Việt của GPT"],"Có bản base và large."],
+["6.2","H","Khi dùng PhoBERT, đầu vào cần xử lý gì đặc biệt?","Tách từ tiếng Việt trước (VnCoreNLP RDRSegmenter, nối âm tiết bằng '_') vì PhoBERT được huấn luyện trên văn bản đã tách từ","Chuyển sang không dấu",["Dịch sang tiếng Anh","Viết hoa toàn bộ"],"Ví dụ: 'Hà_Nội là thủ_đô của Việt_Nam'."],
+["6.2","E","DistilBERT đạt được gì so với BERT-base?","Nhỏ hơn ~40%, nhanh hơn ~60%, giữ ~97% hiệu năng hiểu ngôn ngữ nhờ chưng cất tri thức","Lớn hơn và mạnh hơn",["Nhỏ hơn 99% và giữ 100% hiệu năng","Chỉ dùng cho sinh văn bản"],"Sanh et al. (2019); 6 tầng thay vì 12."],
+["6.2","H","Knowledge distillation (chưng cất tri thức) huấn luyện mô hình học trò thế nào?","Học trò bắt chước phân phối xác suất mềm (soft targets, có temperature) của mô hình thầy, kết hợp nhãn thật","Sao chép trọng số thầy",["Học trò huấn luyện trước, thầy học sau","Chỉ dùng nhãn thật"],"Hinton et al. (2015)."],
+["6.2","H","Bi-encoder và cross-encoder khác nhau thế nào trong so khớp câu/truy hồi?","Bi-encoder mã hóa mỗi câu riêng thành vector rồi so cosine (nhanh, có thể đánh chỉ mục trước); cross-encoder đưa cả cặp vào BERT cùng lúc (chính xác hơn nhưng chậm)","Bi-encoder luôn chính xác hơn",["Cross-encoder không dùng Transformer","Hai cách tương đương"],"Thực tế: bi-encoder truy hồi ứng viên, cross-encoder xếp hạng lại (re-rank) – dùng trong RAG."],
+["6.2","H","Vì sao vector [CLS] (hoặc mean pooling) của BERT chưa fine-tune thường kém cho đo tương đồng câu?","Không gian biểu diễn bất đẳng hướng (anisotropy) và [CLS] chỉ được huấn luyện cho NSP; cần fine-tune (SBERT, SimCSE)","Vì [CLS] luôn bằng vector 0",["Vì BERT không có [CLS]","Vì cosine không dùng được cho BERT"],"Reimers & Gurevych (2019) cho thấy BERT [CLS] còn kém GloVe trung bình trên STS."],
+["6.2","E","Siêu tham số fine-tune BERT điển hình được khuyến nghị trong bài báo gốc là gì?","Learning rate 2e-5 đến 5e-5, batch size 16 hoặc 32, 2–4 epoch","Learning rate 0,1, 100 epoch",["Learning rate 1e-9, 1 bước","Batch size 1, 1000 epoch"],"Fine-tune với LR lớn dễ gây 'catastrophic forgetting'."],
+["6.2","H","Catastrophic forgetting khi fine-tune là gì?","Mô hình quên tri thức tiền huấn luyện khi cập nhật mạnh trên dữ liệu bài toán mới","Mô hình quên nhãn của tập test",["Mất checkpoint khi huấn luyện","Token [MASK] bị xóa"],"Giảm bằng LR nhỏ, ít epoch, discriminative LR, PEFT (adapter, LoRA)."],
+["6.2","H","LoRA (Low-Rank Adaptation) fine-tune mô hình thế nào?","Đóng băng trọng số gốc, học thêm cập nhật hạng thấp ΔW = B·A cho một số ma trận (vd. W_Q, W_V) → rất ít tham số cần huấn luyện","Huấn luyện lại toàn bộ trọng số",["Xóa bớt các tầng","Lượng tử hóa trọng số về 1 bit"],"Hu et al. (2021) – thuộc nhóm PEFT, phổ biến với LLM."],
+["6.2","E","Trong WordPiece của BERT, tiền tố '##' nghĩa là gì?","Mảnh subword tiếp nối phần trước trong cùng một từ (vd. 'playing' → 'play', '##ing')","Token đặc biệt bị che",["Bắt đầu câu mới","Từ viết hoa"],"Ngược với SentencePiece dùng ký hiệu ▁ đánh dấu đầu từ."],
+["6.2","H","Khi fine-tune BERT cho NER, một từ bị tách thành nhiều subword thì gán nhãn thế nào?","Thường gán nhãn cho subword đầu tiên, các subword còn lại gán −100 (bỏ qua khi tính loss) hoặc lặp nhãn I-","Bỏ qua cả từ",["Gán nhãn O cho mọi subword","Gộp thành một token mới trong từ vựng"],"Hugging Face: word_ids() để căn chỉnh nhãn."],
+["6.2","H","SQuAD 2.0 khác SQuAD 1.1 thế nào và BERT xử lý ra sao?","Có câu hỏi không có đáp án trong đoạn; BERT dự đoán span trỏ vào [CLS] để biểu thị 'không có đáp án'","Câu trả lời là sinh tự do",["Không có đoạn văn ngữ cảnh","Chỉ có câu hỏi Có/Không"],"So sánh điểm span tốt nhất với điểm null ([CLS]) theo một ngưỡng."],
+["6.2","E","BART là mô hình gì?","Encoder–decoder Transformer tiền huấn luyện dạng denoising autoencoder (làm hỏng văn bản rồi khôi phục)","Encoder-only như BERT",["Decoder-only như GPT","Mô hình LSTM"],"Lewis et al. (2020) – mạnh cho tóm tắt; mBART là bản đa ngôn ngữ."],
+["6.2","H","Probing (thăm dò) trong nghiên cứu BERT là gì?","Huấn luyện bộ phân lớp đơn giản trên biểu diễn đóng băng của từng tầng để kiểm tra tầng đó mã hóa thông tin gì (POS, cú pháp, ngữ nghĩa)","Fine-tune toàn bộ BERT",["Tấn công đối kháng","Đo tốc độ suy luận"],"Kết quả thường thấy: tầng thấp – bề mặt/cú pháp, tầng giữa – cú pháp, tầng cao – ngữ nghĩa/tác vụ."],
+["6.2","H","Zero-shot cross-lingual transfer với mBERT/XLM-R là gì?","Fine-tune trên dữ liệu gán nhãn của một ngôn ngữ (vd. tiếng Anh) rồi áp dụng trực tiếp cho ngôn ngữ khác (vd. tiếng Việt) không cần nhãn","Dịch toàn bộ dữ liệu sang tiếng Anh",["Huấn luyện không cần dữ liệu nào","Chỉ dùng cho cặp ngôn ngữ cùng chữ viết"],"Hoạt động nhờ không gian biểu diễn chung giữa các ngôn ngữ."],
+["6.2","E","Đoạn code Hugging Face nạp BERT cho phân loại 3 lớp là gì?","AutoModelForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=3)","AutoModelForCausalLM.from_pretrained('bert-base-uncased')",["BertTokenizer.train(num_labels=3)","pipeline('translation', model='bert')"],"Lớp phân lớp trên [CLS] được khởi tạo ngẫu nhiên, cần fine-tune."],
+["6.2","H","Văn bản dài hơn 512 token khi dùng BERT thường xử lý thế nào?","Cắt bớt (head/tail truncation) hoặc chia cửa sổ trượt có chồng lấn (stride) rồi gộp kết quả; hoặc dùng Longformer/BigBird","Tăng max_length lên 4096 mà không đổi gì",["Bỏ positional embedding","BERT tự xử lý được độ dài tùy ý"],"BERT chỉ có position embedding học được cho 512 vị trí."],
+["6.2","E","Ứng dụng encoder-only trong hệ hỏi đáp (đề cương mục 6.5) thường là dạng nào?","QA trích xuất: dự đoán span trả lời trong đoạn văn cho trước (kiểu SQuAD)","Sinh câu trả lời tự do không cần ngữ cảnh",["Dịch câu hỏi","Tóm tắt câu hỏi"],"Với tiếng Việt có bộ UIT-ViQuAD."],
+["6.2","H","Vì sao BERT không phù hợp cho sinh văn bản tự hồi quy?","Được huấn luyện để điền token bị che với ngữ cảnh hai chiều, không có mô hình xác suất trái→phải để sinh tuần tự","Vì BERT không có softmax",["Vì BERT quá nhỏ","Vì BERT không có từ vựng"],"Có thể sinh lặp kiểu Gibbs/mask-predict nhưng chất lượng kém hơn GPT."],
+];
+
+const LESSONS=[["1","Bài 1 · NLP & ứng dụng"],["2","Bài 2 · Đặc trưng & NB"],["3","Bài 3 · Word embeddings"],["4","Bài 4 · RNN/LSTM"],["5","Bài 5 · Seq2Seq & Attention"],["6.1","Bài 6.1 · Transformer"],["6.2","Bài 6.2 · BERT"]];
+const LNAME=Object.fromEntries(LESSONS);
+const DB=[...[...Q_A,...Q_B,...Q_C].map(r=>[r,'S']),...[...QX_A,...QX_B,...QX_C].map(r=>[r,'X'])].map(([r,s],i)=>({id:s+'|'+r[2],src:s,l:r[0],lv:r[1],q:r[2],a:r[3],w:[r[4],...r[5]],e:r[6]}));
+document.getElementById('total').textContent=DB.length;
+document.getElementById('nS').textContent=DB.filter(q=>q.src==='S').length;
+document.getElementById('nX').textContent=DB.filter(q=>q.src==='X').length;
+
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let wrongSet=new Set(store.get('nlp_wrong2',[]));
+let known=new Set(store.get('nlp_known2',[]));
+const saveWrong=()=>{store.set('nlp_wrong2',[...wrongSet]);document.getElementById('wrongN').textContent=wrongSet.size?`(${wrongSet.size})`:''};
+const saveKnown=()=>store.set('nlp_known2',[...known]);
+
+let selL=new Set(LESSONS.map(x=>x[0])), selLv='all', selSrc='S', mode='quiz';
+const shufEl=document.getElementById('shuf');
+const stage=document.getElementById('stage');
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function pool(){return DB.filter(q=>selL.has(q.l)&&(selLv==='all'||q.lv===selLv)&&(selSrc==='all'||q.src===selSrc))}
+function tags(q){return `<span class="tag">${LNAME[q.l].split(' · ')[0]}</span><span class="tag ${q.lv==='H'?'h':''}">${q.lv==='H'?'Khó':'Dễ'}</span>${q.src==='X'?'<span class="tag x">Mở rộng</span>':''}`}
+
+// ---------- filters ----------
+const lw=document.getElementById('lessons');
+function drawLessons(){lw.innerHTML=`<button class="chip ${selL.size===LESSONS.length?'on':''}" data-l="all">Tất cả</button>`+LESSONS.map(([k,n])=>`<button class="chip ${selL.has(k)?'on':''}" data-l="${k}">${n.split(' · ')[0].replace('Bài ','')}<small>${DB.filter(q=>q.l===k&&(selSrc==='all'||q.src===selSrc)).length}</small></button>`).join('')}
+drawLessons();
+lw.onclick=e=>{const b=e.target.closest('[data-l]');if(!b)return;const k=b.dataset.l;
+  if(k==='all'){selL=selL.size===LESSONS.length?new Set():new Set(LESSONS.map(x=>x[0]))}
+  else{selL.has(k)?selL.delete(k):selL.add(k)}
+  lw.querySelectorAll('[data-l]').forEach(c=>c.classList.toggle('on',c.dataset.l==='all'?selL.size===LESSONS.length:selL.has(c.dataset.l)));
+  restart()};
+document.querySelectorAll('[data-src]').forEach(b=>b.onclick=()=>{selSrc=b.dataset.src;document.querySelectorAll('[data-src]').forEach(c=>c.classList.toggle('on',c===b));drawLessons();restart()});
+document.querySelectorAll('[data-lv]').forEach(b=>b.onclick=()=>{selLv=b.dataset.lv;document.querySelectorAll('[data-lv]').forEach(c=>c.classList.toggle('on',c===b));restart()});
+shufEl.onchange=restart;
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{mode=t.dataset.m;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));restart()});
+function info(){const p=pool();const ls=selL.size===LESSONS.length?'Tất cả bài':[...selL].sort().map(x=>'B'+x).join(', ')||'Chưa chọn bài';document.getElementById('fsumTxt').textContent=`${ls} · ${{all:'Mọi nguồn',S:'Theo slide',X:'Bổ sung'}[selSrc]} · ${{all:'Dễ+Khó',E:'Dễ',H:'Khó'}[selLv]} · ${p.length} câu`;document.getElementById('selInfo').textContent=`Đang chọn ${p.length} câu (${p.filter(q=>q.src==='S').length} theo slide, ${p.filter(q=>q.src==='X').length} bổ sung) · ${p.filter(q=>q.lv==='E').length} dễ, ${p.filter(q=>q.lv==='H').length} khó · đã thuộc (flashcard) ${p.filter(q=>known.has(q.id)).length}`}
+
+// ---------- quiz ----------
+let S={};
+function startQuiz(list,label){
+  S={list:shufEl.checked?shuffle(list):list,i:0,score:0,answered:0,wrongNow:[],label,picked:null,opts:[]};
+  renderQ();
+}
+function renderQ(){
+  const {list,i}=S;
+  if(!list.length){stage.innerHTML=`<div class="empty">${mode==='wrong'?'Chưa có câu sai nào trong phạm vi đã chọn. Làm Quiz trước, các câu trả lời sai sẽ được lưu ở đây.':'Không có câu nào. Hãy chọn ít nhất một bài.'}</div>`;return}
+  if(i>=list.length)return renderEnd();
+  const q=list[i];
+  S.opts=shuffle([q.a,...q.w]);S.picked=null;
+  stage.innerHTML=`
+  <div class="meta"><span>${S.label} · Câu ${i+1}/${list.length}</span><span>Đúng ${S.score}/${S.answered}</span></div>
+  <div class="bar"><i style="width:${i/list.length*100}%"></i></div>
+  <div>${tags(q)}</div>
+  <div class="q">${esc(q.q)}</div>
+  <div class="opts">${S.opts.map((o,k)=>`<button class="opt" data-k="${k}"><span class="k">${'ABCD'[k]}</span><span>${esc(o)}</span></button>`).join('')}</div>
+  <div id="expBox"></div>
+  <div class="actions"><span></span><button class="btn pri" id="nextB">Bỏ qua →</button></div>
+  <div class="hint">Phím tắt: 1–4 hoặc A–D để chọn · Enter / → sang câu tiếp</div>`;
+  stage.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pick(+b.dataset.k));
+  document.getElementById('nextB').onclick=next;
+}
+function pick(k){
+  if(S.picked!==null)return;
+  const q=S.list[S.i];S.picked=k;S.answered++;
+  const right=S.opts[k]===q.a;
+  stage.querySelectorAll('.opt').forEach((b,j)=>{b.disabled=true;if(S.opts[j]===q.a)b.classList.add('ok');else if(j===k)b.classList.add('bad')});
+  if(right){S.score++;if(mode==='wrong'){wrongSet.delete(q.id)}}
+  else{wrongSet.add(q.id);S.wrongNow.push(q)}
+  saveWrong();
+  document.getElementById('expBox').innerHTML=`<div class="exp"><b>${right?'✓ Chính xác':'✗ Chưa đúng'} — Đáp án: ${esc(q.a)}</b>${esc(q.e)}</div>`;
+  const nb=document.getElementById('nextB');nb.textContent=S.i+1<S.list.length?'Câu tiếp →':'Xem kết quả →';
+  stage.querySelector('.meta span:last-child').textContent=`Đúng ${S.score}/${S.answered}`;
+}
+function next(){S.i++;renderQ()}
+function renderEnd(){
+  const pct=S.answered?Math.round(S.score/S.answered*100):0;
+  const byL={};S.list.forEach(q=>{byL[q.l]=byL[q.l]||[0,0];byL[q.l][1]++});S.wrongNow.forEach(q=>byL[q.l][0]++);
+  stage.innerHTML=`<div class="center">
+   <div class="small">${S.label} – hoàn thành</div>
+   <div class="big">${S.score}/${S.answered}</div>
+   <div>${pct}% câu đã trả lời là đúng${S.answered<S.list.length?` · bỏ qua ${S.list.length-S.answered} câu`:''}</div>
+   <div class="small" style="margin-top:14px">${Object.entries(byL).map(([l,[w,t]])=>`${LNAME[l].split(' · ')[0]}: sai ${w}/${t}`).join(' · ')}</div>
+   <div class="actions" style="justify-content:center;margin-top:20px">
+     ${S.wrongNow.length?`<button class="btn badb" id="redoW">Làm lại ${S.wrongNow.length} câu sai</button>`:''}
+     <button class="btn pri" id="again">Làm lại từ đầu</button></div></div>`;
+  const r=document.getElementById('redoW');if(r)r.onclick=()=>startQuiz(S.wrongNow,'Làm lại câu sai');
+  document.getElementById('again').onclick=restart;
+}
+
+// ---------- flashcards ----------
+let F={};
+function startFlash(){
+  const p=pool();const rest=p.filter(q=>!known.has(q.id));
+  F={deck:shufEl.checked?shuffle(rest):rest,total:p.length,flipped:false};
+  renderF();
+}
+function renderF(){
+  const p=pool();
+  if(!p.length){stage.innerHTML=`<div class="empty">Không có câu nào. Hãy chọn ít nhất một bài.</div>`;return}
+  if(!F.deck.length){stage.innerHTML=`<div class="center"><div class="big">🎉</div><div>Bạn đã đánh dấu thuộc toàn bộ ${p.length} thẻ trong phạm vi này.</div><div class="actions" style="justify-content:center;margin-top:18px"><button class="btn pri" id="resetK">Đặt lại & học lại</button></div></div>`;
+    document.getElementById('resetK').onclick=()=>{p.forEach(q=>known.delete(q.id));saveKnown();startFlash();info()};return}
+  const q=F.deck[0];const done=F.total-F.deck.length;
+  const others=shuffle([q.a,...q.w]);
+  stage.innerHTML=`
+  <div class="meta"><span>Còn ${F.deck.length} thẻ · đã thuộc ${done}/${F.total}</span><span>${tags(q)}</span></div>
+  <div class="bar"><i style="width:${done/F.total*100}%"></i></div>
+  <div class="flip" id="card"><div class="in">
+    <div class="face"><div class="small">Câu hỏi – hãy tự nhớ đáp án rồi lật thẻ</div><div class="q" style="margin-top:8px">${esc(q.q)}</div>
+      <ul class="lst">${others.map((o,k)=>`<li>${'ABCD'[k]}. ${esc(o)}</li>`).join('')}</ul></div>
+    <div class="face back"><div class="small">Đáp án</div><div class="ans">${esc(q.a)}</div><div>${esc(q.e)}</div></div>
+  </div></div>
+  <div class="actions"><button class="btn badb" id="no">✗ Chưa thuộc</button><button class="btn" id="fl">Lật thẻ</button><button class="btn okb" id="yes">✓ Đã thuộc</button></div>
+  <div class="hint">Space / click để lật · ← chưa thuộc (thẻ quay lại cuối bộ) · → đã thuộc</div>`;
+  F.flipped=false;
+  const card=document.getElementById('card');
+  card.onclick=flip;document.getElementById('fl').onclick=flip;
+  document.getElementById('yes').onclick=()=>fAns(true);document.getElementById('no').onclick=()=>fAns(false);
+}
+function flip(){F.flipped=!F.flipped;document.getElementById('card').classList.toggle('on',F.flipped)}
+function fAns(ok){const q=F.deck.shift();if(ok){known.add(q.id);saveKnown()}else{F.deck.push(q);wrongSet.add(q.id);saveWrong()}renderF();info()}
+
+// ---------- list ----------
+function renderList(){
+  const p=pool();
+  stage.innerHTML=`<input class="search" id="sq" placeholder="Tìm trong câu hỏi, đáp án, giải thích…"><div class="list" id="lst"></div>`;
+  const draw=t=>{t=t.toLowerCase();const f=p.filter(q=>!t||(q.q+q.a+q.e).toLowerCase().includes(t));
+    document.getElementById('lst').innerHTML=f.length?LESSONS.filter(([k])=>f.some(q=>q.l===k)).map(([k,n])=>`<h3 style="margin:18px 0 4px;font-size:16px">${n}</h3>`+f.filter(q=>q.l===k).map(q=>`<details><summary>${q.lv==='H'?'<span class="tag h">Khó</span>':''}${q.src==='X'?'<span class="tag x">Mở rộng</span>':''}${esc(q.q)}</summary><div class="a">→ ${esc(q.a)}</div><div class="e">${esc(q.e)}</div></details>`).join('')).join(''):'<div class="empty">Không tìm thấy.</div>'};
+  draw('');document.getElementById('sq').oninput=e=>draw(e.target.value);
+}
+
+// ---------- routing ----------
+function restart(){info();
+  if(mode==='quiz')startQuiz(pool(),'Quiz');
+  else if(mode==='wrong')startQuiz(pool().filter(q=>wrongSet.has(q.id)),'Ôn câu sai');
+  else if(mode==='flash')startFlash();
+  else renderList();
+}
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT')return;
+  if(mode==='quiz'||mode==='wrong'){
+    if(!S.list||S.i>=S.list.length)return;
+    const m={'1':0,'2':1,'3':2,'4':3,a:0,b:1,c:2,d:3}[e.key.toLowerCase()];
+    if(m!==undefined&&S.picked===null){pick(m);e.preventDefault()}
+    else if(e.key==='Enter'||e.key==='ArrowRight'){next();e.preventDefault()}
+  } else if(mode==='flash'&&F.deck&&F.deck.length){
+    if(e.key===' '){flip();e.preventDefault()}
+    else if(e.key==='ArrowRight')fAns(true);
+    else if(e.key==='ArrowLeft')fAns(false);
+  }
+});
+if(window.innerWidth<600)document.getElementById('filt').removeAttribute('open');
+saveWrong();restart();
+</script>
+<script>
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+</script>
+</body>
+</html>
