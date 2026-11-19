@@ -1,6 +1,6 @@
 // Đổi VERSION mỗi khi cập nhật câu hỏi để điện thoại tải bản mới.
-const VERSION = 'nlp-quiz-v2';
-const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+const VERSION = 'nlp-quiz-v3';
+const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './katex.min.js', './auto-render.min.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
 });

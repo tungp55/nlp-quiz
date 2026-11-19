@@ -80,8 +80,27 @@ header p{margin:0;color:var(--muted);font-size:14px}
 .empty{color:var(--muted);text-align:center;padding:30px}
 .small{font-size:13px;color:var(--muted)}
 .fsum{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.fsum::-webkit-details-marker{display:none}.fsum b::after{content:" ▾";color:var(--muted)}details[open] .fsum b::after{content:" ▴"}
+.notes h3{font-size:17px;margin:22px 0 8px;padding-top:6px;border-top:1px solid var(--line)}
+.notes h3:first-of-type{border-top:0}
+.notes ul{padding-left:20px;margin:6px 0}.notes li{margin:4px 0}
+.notes table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0;display:block;overflow-x:auto}
+.notes th,.notes td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.notes th{background:var(--accent-soft)}
+.notes code{font-size:13px;background:var(--line);padding:1px 5px;border-radius:5px;word-break:break-all}
+.notes .ext{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;background:var(--x-soft);color:var(--x);margin-right:4px;vertical-align:1px}
+.notes .src{font-size:13px;color:var(--muted);font-style:italic}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:6px 0;margin:8px 0}
+.katex math{font-size:1.08em}
+.notes ol{padding-left:20px}.notes ol li{margin:6px 0}
+@media (max-width:560px){.katex-display math{font-size:.95em}}
+.toc{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px}
+.toc a{font-size:13px;color:var(--accent);text-decoration:none;border:1px solid var(--line);padding:3px 9px;border-radius:999px}
+#stage.out-l{transform:translateX(-40px);opacity:0;transition:transform .16s,opacity .16s}
+#stage.out-r{transform:translateX(40px);opacity:0;transition:transform .16s,opacity .16s}
+.swipehint{display:none;font-size:12px;color:var(--muted);text-align:center;margin-top:10px}
+@media (hover:none){.swipehint{display:block}}
 .toggle{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);cursor:pointer}
-@media (max-width:560px){.hint{display:none}.opt{padding:14px 12px}header p{display:none}header h1{font-size:20px}.chip{padding:5px 10px;font-size:13px}.tabs{margin-top:12px}.q{font-size:17px}.tab{font-size:13px}.flip .in{min-height:360px}}
+@media (max-width:560px){.actions #nextB,.actions #fl{flex:1}.actions>span:empty{display:none}#nextB{padding:14px}.hint{display:none}.opt{padding:14px 12px}header p{display:none}header h1{font-size:20px}.chip{padding:5px 10px;font-size:13px}.tabs{margin-top:12px}.q{font-size:17px}.tab{font-size:13px}.flip .in{min-height:360px}}
 </style>
 </head>
 <body>
@@ -114,11 +133,14 @@ header p{margin:0;color:var(--muted);font-size:14px}
   <button class="tab" data-m="flash">Flashcard</button>
   <button class="tab" data-m="wrong">Ôn câu sai <span id="wrongN"></span></button>
   <button class="tab" data-m="list">Bảng ôn</button>
+  <button class="tab" data-m="notes">Tóm tắt</button>
 </div>
 
 <div class="panel" id="stage"></div>
 </div>
 
+<script defer src="katex.min.js"></script>
+<script defer src="auto-render.min.js"></script>
 <script>
 // Format: [bài, độ khó (E=dễ, H=khó), câu hỏi, đáp án đúng, [phương án sai], giải thích]
 const Q_A = [
@@ -595,6 +617,304 @@ const QX_C = [
 ["6.2","H","Vì sao BERT không phù hợp cho sinh văn bản tự hồi quy?","Được huấn luyện để điền token bị che với ngữ cảnh hai chiều, không có mô hình xác suất trái→phải để sinh tuần tự","Vì BERT không có softmax",["Vì BERT quá nhỏ","Vì BERT không có từ vựng"],"Có thể sinh lặp kiểu Gibbs/mask-predict nhưng chất lượng kém hơn GPT."],
 ];
 
+// Hệ thống kiến thức từng bài. Công thức: $...$ (inline), $$...$$ (khối).
+const NOTES = {
+"1": String.raw`
+<p class="src">Dự án chưa có slide Bài 1 – phần này tổng hợp theo đề cương học phần và kiến thức nền.</p>
+<h3>1. NLP là gì</h3>
+<ul>
+<li>Lĩnh vực giúp máy tính <b>hiểu, phân tích và sinh</b> ngôn ngữ tự nhiên; giao thoa KHMT – AI – ngôn ngữ học.</li>
+<li>Các mức phân tích: <b>hình thái</b> (morphology) → <b>cú pháp</b> (syntax) → <b>ngữ nghĩa</b> (semantics) → <b>ngữ dụng</b> (pragmatics).</li>
+<li>Khó khăn cốt lõi: <b>nhập nhằng</b> (từ vựng, cú pháp – "I saw the man with the telescope"), đa dạng, phụ thuộc ngữ cảnh, dữ liệu thưa (định luật Zipf $f \propto 1/r$).</li>
+<li>Lịch sử: luật (ELIZA 1966) → thống kê (HMM, CRF, SMT) → neural (word2vec 2013, seq2seq 2014) → tiền huấn luyện (BERT, GPT 2018) → LLM.</li>
+</ul>
+<h3>2. Ứng dụng (theo đề cương)</h3>
+<table><tr><th>Bài toán</th><th>Dạng</th></tr>
+<tr><td>Kiểm tra chính tả</td><td>Mô hình ngôn ngữ + khoảng cách chỉnh sửa</td></tr>
+<tr><td>Phát hiện đạo văn</td><td>Độ tương tự văn bản (Bài 3)</td></tr>
+<tr><td>Phân tích cảm xúc, phân lớp, lọc spam</td><td>Phân lớp văn bản (Bài 2)</td></tr>
+<tr><td>Nhận dạng thực thể (NER)</td><td>Gán nhãn chuỗi (Bài 4)</td></tr>
+<tr><td>Dịch máy, tóm tắt</td><td>Seq2seq (Bài 5, 6)</td></tr>
+<tr><td>Hỏi đáp</td><td>Encoder-only trích xuất (6.2), LLM + RAG (7, 8)</td></tr></table>
+<h3>3. Quy trình xây dựng ứng dụng NLP</h3>
+<p>Thu thập dữ liệu → Tiền xử lý → Biểu diễn / trích chọn đặc trưng → Huấn luyện mô hình → Đánh giá → Triển khai (lặp lại).</p>
+<ul>
+<li><b>Tiền xử lý:</b> làm sạch (regex: HTML, URL, email), chuẩn hóa (chữ thường, Unicode, dấu tiếng Việt), tách từ (tokenization), bỏ stopwords, stemming (cắt hậu tố theo luật) / lemmatization (dạng gốc theo từ điển + từ loại).</li>
+<li>Tiếng Việt: khoảng trắng tách <b>âm tiết</b>, không tách từ ("học sinh") → cần bộ tách từ (VnCoreNLP, underthesea, pyvi).</li>
+<li><b>Thư viện:</b> NLTK (đề cương 1.4.1), spaCy, Gensim, Hugging Face Transformers, scikit-learn.</li>
+</ul>
+<h3>4. Đánh giá phân lớp</h3>
+$$P=\frac{TP}{TP+FP},\qquad R=\frac{TP}{TP+FN}$$
+$$F_1=\frac{2PR}{P+R}$$
+<ul><li>Dữ liệu mất cân bằng → accuracy gây hiểu lầm; dùng F1, macro-F1 (trung bình đều các lớp).</li>
+<li>Chia train / dev / test; dev để chọn siêu tham số, test chỉ dùng đánh giá cuối.</li></ul>
+<h3>5. Thông tin học phần</h3>
+<ul><li>3 tín chỉ, tiên quyết: Học máy, Học sâu. 8 bài: NLP & ứng dụng; đặc trưng & NB; biểu diễn từ; RNN; seq2seq & attention; encoder-only; LLM; RAG.</li>
+<li>Điểm: $DHP = 0{,}1A_1 + 0{,}3A_2 + 0{,}6A_3$ — A2: trắc nghiệm sau Bài 7; A3: trắc nghiệm + vấn đáp bài tập lớn.</li></ul>
+`,
+
+"2": String.raw`
+<h3>1. Bài toán lọc thư rác</h3>
+<ul>
+<li>Spam: thư điện tử không mong muốn (đặc biệt quảng cáo). Lọc thư rác = <b>phân loại văn bản</b> nhị phân: <b>spam</b> / <b>ham</b>.</li>
+<li>Dữ liệu: <b>Ling Spam</b>, <b>Enron</b> (33.716 email, 6 thư mục; 16.545 spam, 17.171 ham).</li>
+<li>Phân loại văn bản: đầu vào văn bản $d$, tập lớp $C=\{c_1,\dots,c_J\}$, (học có giám sát) tập huấn luyện $(d_1,c_1),\dots,(d_m,c_m)$ → bộ phân lớp $\gamma: d \to c$.</li>
+<li><b>Luật thủ công</b> (vd. <i>black-list-address OR ("dollars" AND "have been selected")</i>): chính xác nếu chuyên gia thiết kế kỹ, nhưng <b>tốn kém xây dựng/duy trì</b>.</li>
+<li><b>Học máy</b>: Naive Bayes, Logistic regression, SVM, Neural network…</li>
+</ul>
+<h3>2. Đặc trưng (features)</h3>
+<ul>
+<li>Đặc trưng: biến đo lường được, có tính phân biệt. Cần đủ nhưng <b>không quá nhiều</b>.</li>
+<li>Thủ công (feature engineering): thống kê (độ dài, vị trí), từ điển (SentiWordNet, SentiWords, MPQA), cú pháp (POS), đặc thù bài toán (số emoji).</li>
+<li><b>Vector hóa</b>: biến văn bản thành vector số thực. Tokenization + counting + normalization = <b>Bag of Words</b> (CountVectorizer).</li>
+</ul>
+<h3>3. Các cách biểu diễn</h3>
+<table><tr><th>Phương pháp</th><th>Ý tưởng</th><th>Hạn chế</th></tr>
+<tr><td>BoW / Count</td><td>Đếm số lần xuất hiện mỗi từ trong từ vựng</td><td>Mất thứ tự từ; vector rất lớn, thưa (~80.000 chiều)</td></tr>
+<tr><td>N-grams</td><td>Đặc trưng là chuỗi n từ liên tiếp; "I am learning NLP" → bi-gram: I am, am learning, learning NLP</td><td>Số chiều tăng mạnh</td></tr>
+<tr><td>Ma trận đồng xuất hiện</td><td>Đếm số lần cặp từ xuất hiện cùng nhau (trong cửa sổ)</td><td>Kích thước $|V|\times|V|$</td></tr>
+<tr><td>TF-IDF</td><td>Trọng số cao cho từ nhiều trong văn bản nhưng hiếm trong tập</td><td>Vẫn thưa, không ngữ nghĩa</td></tr></table>
+<p>Câu $n$ token có $n-k+1$ k-gram. Ví dụ tập "I like deep learning. I like NLP. I enjoy flying." (cửa sổ 1): $X(\text{I},\text{like})=2$, $X(\text{I},\text{enjoy})=1$.</p>
+$$\text{tf-idf}(t,d)=\text{tf}(t,d)\times \log\frac{N}{\text{df}(t)}$$
+<p>Từ xuất hiện trong mọi văn bản: $\text{idf}=\log 1=0$.</p>
+<h3>4. Naive Bayes</h3>
+<ul><li>Chọn lớp có <b>xác suất hậu nghiệm lớn nhất</b> (MAP):</li></ul>
+$$\hat c=\arg\max_c P(c\mid d)=\arg\max_c P(d\mid c)\,P(c)$$
+<ul><li><b>Giả định naive</b>: các từ độc lập có điều kiện khi biết lớp; BoW (thứ tự không quan trọng):</li></ul>
+$$P(d\mid c)=P(w_1,\dots,w_n\mid c)=\prod_{i=1}^{n}P(w_i\mid c)$$
+<ul><li>Tham số: <b>prior</b> $P(c)$ và <b>likelihood</b> $P(w\mid c)$. Ước lượng <b>Maximum Likelihood</b> bằng đếm:</li></ul>
+$$P(w\mid c)=\frac{\text{count}(w,c)}{\sum_{w'}\text{count}(w',c)}$$
+<ul><li><b>Laplace smoothing</b> (tránh xác suất 0 khi từ chưa xuất hiện trong lớp), $V$ = số từ khác nhau:</li></ul>
+$$P(w\mid c)=\frac{\text{count}(w,c)+1}{\sum_{w'}\text{count}(w',c)+V}$$
+<ul>
+<li>Thực tế cộng $\log$ thay vì nhân để tránh underflow.</li>
+<li>Spam nếu $P(\text{spam}\mid m) > P(\neg\text{spam}\mid m)$.</li>
+<li>Học = cực đại $P(x,y)$ bằng <b>đếm</b>. NB là mô hình <b>sinh</b> (generative); mô hình <b>phân biệt</b> (logistic regression) tính trực tiếp $P(y\mid x)$.</li>
+<li>Vấn đề: giả định độc lập sai ("beautiful" và "gorgeous" phụ thuộc nhau).</li>
+<li>Ứng dụng: chẩn đoán y tế, phân lớp văn bản, lọc spam. Banko & Brill: <b>đủ dữ liệu thì bộ phân loại ít quan trọng</b>.</li>
+</ul>
+<h3>5. Thực hành lọc spam</h3>
+<p>Chuẩn bị dữ liệu (Ling Spam/Enron) → tiền xử lý (regex, đơn vị nhỏ nhất là từ) → vector hóa (BoW/TF-IDF/n-gram) → huấn luyện (NB, linear SVM, LR – hợp với rất nhiều đặc trưng) → đánh giá. Cải tiến chủ yếu ở <b>feature engineering</b>.</p>
+`,
+
+"3": String.raw`
+<h3>1. Bài toán phát hiện đạo văn</h3>
+<ul><li>Đầu vào: văn bản cần kiểm tra + tập văn bản → <b>độ tương tự</b>. Ví dụ hệ thống DoIT (UET).</li>
+<li>Bài toán khó của <b>thu hồi thông tin</b>; bài toán con: tương đồng mức câu. Thách thức: văn bản dài, đa dạng cấu trúc/từ vựng, cần cả <b>ngữ nghĩa</b> và <b>cú pháp</b>.</li></ul>
+$$\cos(\mathbf a,\mathbf b)=\frac{\mathbf a\cdot\mathbf b}{\lVert\mathbf a\rVert\,\lVert\mathbf b\rVert}$$
+<h3>2. Nhắc lại cách biểu diễn</h3>
+<ul><li>BoW, ma trận đồng xuất hiện (cửa sổ trượt, ô $(i,j)$ = số lần từ hàng đồng xuất hiện với từ cột), TF-IDF.</li>
+<li><b>One-hot</b>: số chiều = $|V|$, thưa, mọi cặp từ trực giao ⇒ không thể hiện tương đồng.</li></ul>
+<h3>3. Word2Vec (Mikolov và cs., 2013)</h3>
+<table><tr><th>CBOW</th><th>Skip-gram</th></tr>
+<tr><td>Dự đoán <b>từ trung tâm</b> từ các từ ngữ cảnh</td><td>Dự đoán <b>các từ ngữ cảnh</b> từ từ trung tâm</td></tr></table>
+<ul><li>Duyệt corpus với cửa sổ trượt; lớp ra <b>softmax</b> trên từ vựng:</li></ul>
+$$P(w_O\mid w_I)=\frac{\exp(\mathbf v'_{w_O}{}^{\top}\mathbf v_{w_I})}{\sum_{w=1}^{|V|}\exp(\mathbf v'_{w}{}^{\top}\mathbf v_{w_I})}$$
+<ul><li>Sau huấn luyện, <b>mỗi hàng của ma trận $W^{(1)}$</b> là vector của một từ. Vector mã hóa quan hệ ngữ nghĩa: $\vec{king}-\vec{man}+\vec{woman}\approx\vec{queen}$.</li>
+<li><span class="ext">Mở rộng</span> Softmax tốn $O(|V|)$ → negative sampling / hierarchical softmax.</li></ul>
+<h3>4. GloVe – Global Vectors</h3>
+<ul><li>Kết hợp <b>global context</b> (thống kê đồng xuất hiện toàn corpus, phân tích ma trận) và <b>local context</b> (cửa sổ trượt). Huấn luyện chỉ trên ma trận đồng xuất hiện.</li>
+<li>Ký hiệu: $X_{ij}$ = số lần từ $j$ xuất hiện trong ngữ cảnh từ $i$; $X_i=\sum_k X_{ik}$; $P_{ij}=P(j\mid i)=X_{ij}/X_i$.</li>
+<li>Ý tưởng tỉ lệ $P_{ik}/P_{jk}$ (ví dụ ice/steam): $k$=solid → lớn; $k$=gas → rất nhỏ; $k$=water/fashion → ≈ 1.</li>
+<li>$F(i,j,k)=P_{ik}/P_{jk}$ không dùng trực tiếp được (vector nhiều chiều vs vô hướng, 3 thành phần) → dùng hiệu vector, tích vô hướng, hàm $\exp$ (đồng hình), thêm 2 bias:</li></ul>
+$$\mathbf w_i^{\top}\tilde{\mathbf w}_k+b_i+\tilde b_k=\log X_{ik}$$
+<ul><li>Hàm chi phí có trọng số:</li></ul>
+$$J=\sum_{i,j=1}^{|V|} f(X_{ij})\left(\mathbf w_i^{\top}\tilde{\mathbf w}_j+b_i+\tilde b_j-\log X_{ij}\right)^2$$
+<p><span class="ext">Mở rộng</span> $f(x)=(x/x_{max})^{\alpha}$ nếu $x\lt x_{max}$, ngược lại 1 ($x_{max}=100,\ \alpha=3/4$).</p>
+<ul><li><b>Ưu</b>: huấn luyện nhanh (chỉ phân tích ma trận), ổn định trên dữ liệu lớn, tốt cả với dữ liệu/vector nhỏ, dừng sớm được. <b>Nhược</b>: tốn bộ nhớ lưu $X$, nhạy với khởi tạo learning rate.</li></ul>
+<h3>5. FastText (Facebook)</h3>
+<ul><li>Mở rộng word2vec (kiểu <b>skip-gram</b>) với <b>n-gram ký tự</b> (sub-word): "difference" ← di, dif, diff, …; vector từ = <b>tổng</b> vector các n-gram.</li>
+<li>Biểu diễn tiền tố/hậu tố, <b>từ hiếm</b>, suy ra vector cho <b>từ mới</b> (dioxide). Nhược: tốn bộ nhớ (lưu theo ký tự).</li></ul>
+<h3>6. ELMo – Embeddings from Language Models</h3>
+<ul><li>Kiến trúc: <b>char-CNN</b> tạo raw word vector → <b>2 tầng biLM</b> (LSTM xuôi + ngược) → vector tầng giữa.</li>
+<li>Biểu diễn cuối = <b>tổ hợp có trọng số</b> của vector ban đầu và 2 tầng biLM:</li></ul>
+$$\text{ELMo}_k=\gamma\sum_{j=0}^{L}s_j\,\mathbf h_{k,j}$$
+<ul><li><b>Ưu</b>: biểu diễn <b>theo ngữ cảnh</b> (cùng từ "read" khác vector), tốt hơn word2vec/GloVe, xử lý tốt từ hiếm (ký tự). <b>Nhược</b>: tốn bộ nhớ.</li></ul>
+<h3>7. So sánh nhanh</h3>
+<table><tr><th>Mô hình</th><th>Cơ chế</th><th>Ngữ cảnh</th><th>OOV / từ hiếm</th></tr>
+<tr><td>Word2Vec</td><td>Dự đoán (CBOW/SG)</td><td>Tĩnh</td><td>Không</td></tr>
+<tr><td>GloVe</td><td>Phân tích ma trận đồng xuất hiện</td><td>Tĩnh</td><td>Không</td></tr>
+<tr><td>FastText</td><td>Skip-gram + n-gram ký tự</td><td>Tĩnh</td><td>Có</td></tr>
+<tr><td>ELMo</td><td>char-CNN + biLSTM LM</td><td>Động</td><td>Có</td></tr></table>
+<h3>8. Xây dựng mô hình</h3>
+<p>Thu thập dữ liệu lớn (Wikipedia) → chọn mô hình phù hợp → huấn luyện (thường cần GPU) → áp dụng (vd. vector câu = trung bình vector từ → cosine để phát hiện đạo văn).</p>
+`,
+
+"4": String.raw`
+<h3>1. RNN</h3>
+<ul><li>Trạng thái ẩn truyền qua các bước → phù hợp dữ liệu chuỗi:</li></ul>
+$$\mathbf h_t=\tanh(W_{hh}\mathbf h_{t-1}+W_{xh}\mathbf x_t+\mathbf b)$$
+<ul><li>Vấn đề: <b>phụ thuộc xa</b>, "quên thông tin cũ" do <b>vanishing gradient</b>:</li></ul>
+$$\frac{\partial \mathbf h_t}{\partial \mathbf x_0}=\frac{\partial \mathbf h_t}{\partial \mathbf h_{t-1}}\cdot\frac{\partial \mathbf h_{t-1}}{\partial \mathbf h_{t-2}}\cdots\frac{\partial \mathbf h_0}{\partial \mathbf x_0}$$
+<ul><li>Tích nhiều thừa số &lt; 1 → tiến về 0. Giải pháp: đổi hàm kích hoạt (giảm nhưng không hết, ảnh hưởng hiệu năng) hoặc <b>LSTM</b>.</li>
+<li><span class="ext">Mở rộng</span> Exploding gradient → gradient clipping; huấn luyện bằng BPTT.</li></ul>
+<h3>2. LSTM</h3>
+<ul><li>Ý tưởng: <b>đường truyền trực tiếp</b> (cell state $C_t$) từ quá khứ đến hiện tại. 3 cổng: <b>quên</b> $f$, <b>vào</b> $i$, <b>ra</b> $o$ – nơ-ron $\sigma$ (giá trị $[0,1]$), nhân từng phần tử ⊙ để lọc thông tin.</li></ul>
+$$\begin{aligned}
+f_t&=\sigma(W_f[\mathbf h_{t-1},\mathbf x_t]+b_f)\\
+i_t&=\sigma(W_i[\mathbf h_{t-1},\mathbf x_t]+b_i)\\
+\tilde C_t&=\tanh(W_C[\mathbf h_{t-1},\mathbf x_t]+b_C)\\
+C_t&=f_t\odot C_{t-1}+i_t\odot\tilde C_t\\
+o_t&=\sigma(W_o[\mathbf h_{t-1},\mathbf x_t]+b_o)\\
+\mathbf h_t&=o_t\odot\tanh(C_t)
+\end{aligned}$$
+<ul><li>$i_t$ quyết định thành phần nào được cập nhật; $\tilde C_t$ cung cấp nội dung mới; $o_t$ quyết định phần nào của cell state sinh đầu ra.</li>
+<li><span class="ext">Mở rộng</span> GRU: 2 cổng (update $z$, reset $r$), không có cell state riêng: $\mathbf h_t=(1-z_t)\odot\mathbf h_{t-1}+z_t\odot\tilde{\mathbf h}_t$. Số tham số LSTM: $4\,(h(h+d)+h)$.</li></ul>
+<h3>3. Mô hình ngôn ngữ</h3>
+$$P(W)=\prod_{i=1}^{n}P(w_i\mid w_1,\dots,w_{i-1})$$
+<ul><li>Ứng dụng: dịch máy (P(high winds tonight) &gt; P(large winds tonight)), sửa lỗi (minutes vs minuets), nhận dạng giọng nói (I saw a van vs eyes awe of an), tóm tắt, hỏi đáp.</li>
+<li>RNN/LSTM: tại mỗi bước, softmax dự đoán từ tiếp theo.</li>
+<li><span class="ext">Mở rộng</span> Perplexity $PP(W)=P(w_1\dots w_N)^{-1/N}$ – càng thấp càng tốt.</li></ul>
+<h3>4. LSTM cho dịch máy (seq2seq)</h3>
+<ul><li>Ước lượng $P(e\mid f)$: <b>encoder</b> RNN nén câu nguồn thành vector, <b>decoder</b> RNN là mô hình ngôn ngữ sinh câu đích có điều kiện.</li>
+<li>Giải mã tham lam không quay lại được → <b>beam search</b> giữ $k$ bản dịch tốt nhất (k ≈ 5–10). Chi tiết ở Bài 5.</li></ul>
+<h3>5. LSTM cho phân loại</h3>
+<ul><li>LSTM một chiều: dùng đầu ra <b>từ cuối</b> $\mathbf h_n$ làm đặc trưng.</li>
+<li>Bi-LSTM: kết hợp (Sum) đầu ra mọi từ → bộ phân lớp tuyến tính.</li></ul>
+<h3>6. Gán nhãn chuỗi</h3>
+<ul><li>POS tagging ("John saw the saw…": saw/VBD vs saw/NN), trích chọn thông tin, <b>NER</b>, Semantic Role Labeling, gán nhãn chuỗi gen.</li>
+<li>Bi-LSTM: vector mỗi token = <b>nối</b> trạng thái xuôi và ngược → phân lớp từng token. <span class="ext">Mở rộng</span> thêm CRF + Viterbi (Bi-LSTM-CRF).</li></ul>
+<h3>7. NER</h3>
+<ul><li>Mục tiêu: xác định tên và phân nhóm: <b>người, địa điểm, tổ chức</b>; mở rộng: ngày, email, độ đo, tên thuốc, gen…</li>
+<li>Ứng dụng: dịch máy, hỏi đáp, truy vấn thông tin, tổng hợp giọng nói.</li>
+<li>Khó khăn: nhiều dạng (John Smith, Mr Smith, John), nhập nhằng loại (May: người/tháng; Washington: người/địa điểm), nhập nhằng với từ thường, định dạng.</li>
+<li>Học máy: thu thập dữ liệu, gán nhãn mỗi từ là lớp thực thể hoặc <b>O</b>, trích đặc trưng, huấn luyện. Lược đồ BIO: <i>John/B-PER Smith/I-PER lives/O in/O New/B-LOC York/I-LOC</i>.</li></ul>
+`,
+
+"5": String.raw`
+<h3>1. Dịch máy & NMT</h3>
+<ul><li>MT: câu $x$ (ngôn ngữ nguồn) → câu $y$ (ngôn ngữ đích). NMT dùng một mạng nơ-ron, kiến trúc <b>seq2seq</b> gồm 2 RNN (Sutskever và cs., 2014).</li>
+<li>Encoder tổng hợp <b>toàn bộ câu nguồn vào một vector</b>; decoder là mô hình ngôn ngữ có điều kiện; trạng thái decoder chỉ phụ thuộc trạng thái và đầu ra trước đó.</li></ul>
+$$P(y\mid x)=\prod_{t=1}^{T}P(y_t\mid y_1,\dots,y_{t-1},x)$$
+<h3>2. Huấn luyện</h3>
+<ul><li>Tối ưu <b>đầu–cuối</b> như một hệ thống; decoder nhận từ đúng ở bước trước (teacher forcing). Loss = trung bình negative log-prob:</li></ul>
+$$J=\frac{1}{T}\sum_{t=1}^{T}J_t,\qquad J_t=-\log P(y_t^{*}\mid y^{*}_{\lt t},x)$$
+<ul><li>Khi test: đầu ra decoder bước $t$ làm đầu vào bước $t+1$.</li></ul>
+<h3>3. Giải mã</h3>
+<ul><li><b>Greedy</b>: argmax từng bước – không quay lại sửa được (the poor → <i>are</i> thay vì <i>don't</i>).</li>
+<li>Vét cạn: $O(V^T)$ – quá lớn.</li>
+<li><b>Beam search</b>: giữ $k$ giả thuyết tốt nhất mỗi bước ($k$ = 5–10). Không đảm bảo tối ưu nhưng hiệu quả hơn nhiều. Điểm giả thuyết:</li></ul>
+$$\text{score}(y_1,\dots,y_t)=\sum_{i=1}^{t}\log P(y_i\mid y_{\lt i},x)$$
+<ul><li>Gặp &lt;END&gt;: giả thuyết hoàn thành, đặt sang bên, tiếp tục. Dừng khi đạt bước $T$ hoặc có $n$ giả thuyết hoàn thành.</li>
+<li>Câu dài điểm thấp → <b>chuẩn hóa theo độ dài</b>:</li></ul>
+$$\frac{1}{t}\sum_{i=1}^{t}\log P(y_i\mid y_{\lt i},x)$$
+<h3>4. NMT vs SMT</h3>
+<table><tr><th>Ưu điểm NMT</th><th>Nhược điểm NMT</th></tr>
+<tr><td>Trôi chảy hơn, dùng ngữ cảnh và cụm từ tương tự tốt hơn; tối ưu đầu–cuối; ít công sức người, không trích đặc trưng; cùng phương pháp cho mọi cặp ngôn ngữ</td><td>Khó giải thích, khó gỡ lỗi; khó kiểm soát (không áp luật/hướng dẫn dịch); lo ngại an toàn</td></tr></table>
+<p>2014: bài báo seq2seq; <b>2016</b>: Google Translate chuyển SMT → NMT. Còn khó: OOV, lệch lĩnh vực, ngữ cảnh dài, cặp ít dữ liệu, common sense.</p>
+<h3>5. BLEU</h3>
+<ul><li>So sánh bản dịch máy với bản người dịch dựa trên precision <b>n-gram</b> (đến 3–4-gram) + <b>phạt câu quá ngắn</b>. Tốt nhưng không hoàn hảo: bản dịch tốt vẫn có thể BLEU thấp.</li></ul>
+<p><span class="ext">Mở rộng</span></p>
+$$\text{BLEU}=BP\cdot\exp\Big(\sum_{n=1}^{4}w_n\log p_n\Big)$$
+$$BP=\begin{cases}1 & c>r\\ e^{1-r/c} & c\le r\end{cases}$$
+<h3>6. Attention</h3>
+<ul><li>Vấn đề <b>nút cổ chai</b>: một vector phải chứa mọi thông tin câu nguồn.</li>
+<li>Ý tưởng: tại mỗi bước giải mã, <b>tập trung vào một phần</b> câu nguồn.</li></ul>
+<p>Với trạng thái encoder $\mathbf h_1,\dots,\mathbf h_N$ và trạng thái decoder $\mathbf s_t$:</p>
+<ol>
+<li>Điểm attention (dot product): $$\mathbf e^t=[\mathbf s_t^{\top}\mathbf h_1,\dots,\mathbf s_t^{\top}\mathbf h_N]$$</li>
+<li>Phân phối attention: $$\boldsymbol\alpha^t=\operatorname{softmax}(\mathbf e^t)$$</li>
+<li>Đầu ra attention (tổng có trọng số): $$\mathbf a_t=\sum_{i=1}^{N}\alpha_i^t\,\mathbf h_i$$</li>
+<li>Nối $[\mathbf a_t;\mathbf s_t]$ rồi tính đầu ra như seq2seq thường.</li></ol>
+<ul><li>Lợi ích: cải thiện mạnh NMT, giải quyết nút cổ chai, giảm vanishing gradient (đường tắt), <b>diễn giải được</b> (alignment tự học).</li>
+<li><span class="ext">Mở rộng</span> Bahdanau (additive: $\mathbf v^{\top}\tanh(W_1\mathbf h_i+W_2\mathbf s)$) vs Luong (multiplicative: $\mathbf s^{\top}W\mathbf h_i$).</li></ul>
+<h3>7. Seq2seq linh hoạt</h3>
+<p>Tóm tắt (dài → ngắn), hội thoại (câu trước → câu sau), phân tích cú pháp, sinh mã (NL → Python).</p>
+`,
+
+"6.1": String.raw`
+<h3>1. Attention (nhắc lại)</h3>
+<ul><li><b>Cross-attention</b> (Bahdanau 2015): phần tử chuỗi này chú ý tới chuỗi khác. <b>Self-attention</b> (Cheng 2016, Vaswani 2017): chú ý tới chính chuỗi đó → biểu diễn nhạy ngữ cảnh.</li>
+<li>Query (trạng thái decoder) – Key (trạng thái encoder) → trọng số → softmax → tổng có trọng số các Value. Ví dụ $a=[2.1,-0.1,0.3,-1.0]\Rightarrow\alpha\approx[0.76,0.08,0.13,0.03]$.</li></ul>
+$$\operatorname{Attention}(Q,K,V)=\operatorname{softmax}\!\Big(\frac{QK^{\top}}{\sqrt{d_k}}\Big)V$$
+<p><span class="ext">Mở rộng</span> Chia $\sqrt{d_k}$: tích vô hướng có phương sai $d_k$, tránh softmax bão hòa.</p>
+<h3>2. Transformer – "Attention is All You Need" (2017)</h3>
+<ul><li>Seq2seq <b>hoàn toàn dựa trên attention</b>; nhanh vì chỉ nhân ma trận (song song).</li>
+<li>Hai loại: <b>Encoder–Decoder</b> (T5, mBART) và <b>Decoder-only</b> (GPT, LLaMa). (Encoder-only: BERT – 6.2.)</li>
+<li>Khối encoder: Multi-Head Attention → Add &amp; Norm → Feed Forward → Add &amp; Norm (×N). Decoder: <b>Masked</b> MHA → (cross) MHA → FFN, đầu vào outputs shifted right, cuối là Linear + Softmax.</li>
+<li>Đầu vào tách <b>subword</b> (the book _s were improv _ed), tra input embedding.</li></ul>
+<h3>3. Multi-head attention</h3>
+<ul><li>Trực giác: các phần khác nhau của câu giúp giải nhập nhằng theo cách khác nhau (cú pháp – ngữ cảnh gần; ngữ nghĩa – ngữ cảnh xa), ví dụ các nghĩa của "run".</li></ul>
+$$\operatorname{MultiHead}(Q,K,V)=\operatorname{Concat}(\text{head}_1,\dots,\text{head}_h)\,W^{O}$$
+$$\text{head}_i=\operatorname{Attention}(QW_i^{Q},\,KW_i^{K},\,VW_i^{V})$$
+<p>Code: chiếu tuyến tính → <code>view(nbatches, -1, heads, d_k).transpose(1,2)</code> → attention → transpose, <code>view(nbatches, -1, h*d_k)</code> → $W_o$.</p>
+<h3>4. Positional encoding</h3>
+<ul><li>Attention thuần không phân biệt thứ tự ("A big dog and a big cat": hai "big" giống hệt) → <b>cộng</b> embedding vị trí: $\mathbf w_{big}+\mathbf w_{pos2}$.</li>
+<li><b>Sinusoidal</b> (Vaswani):</li></ul>
+$$p_t^{(i)}=\begin{cases}\sin(\omega_k t), & i=2k\\ \cos(\omega_k t), & i=2k+1\end{cases},\qquad \omega_k=\frac{1}{10000^{2k/d}}$$
+<ul><li><b>Learned</b> (Shaw 2018): linh hoạt, nhưng <b>không ngoại suy</b> được cho chuỗi dài hơn.</li>
+<li><b>Absolute</b>: cộng vào đầu vào, hi vọng mô hình tự nắm vị trí tương đối; <b>Relative</b>: mã hóa tường minh vị trí tương đối.</li>
+<li><b>RoPE</b> (Su 2021): tích vô hướng chỉ phụ thuộc vị trí tương đối (xoay vector bằng lượng giác/số phức):</li></ul>
+$$f_q(\mathbf x_m,m)\cdot f_k(\mathbf x_n,n)=g(\mathbf x_m,\mathbf x_n,m-n)$$
+<h3>5. Chuẩn hóa & residual</h3>
+<ul><li>Transformer nhiều tầng cũng gặp vanishing/exploding gradient như RNN.</li></ul>
+$$\operatorname{LayerNorm}(\mathbf x)=\frac{\mathbf g}{\sigma(\mathbf x)}\odot(\mathbf x-\mu(\mathbf x))+\mathbf b$$
+$$\mu=\frac1n\sum_i x_i,\qquad \sigma=\sqrt{\frac1n\sum_i(x_i-\mu)^2}$$
+$$\operatorname{RMSNorm}(\mathbf x)=\frac{\mathbf x}{\operatorname{RMS}(\mathbf x)}\odot\mathbf g$$
+$$\operatorname{RMS}(\mathbf x)=\sqrt{\frac1n\sum_i x_i^2}$$
+<ul><li>RMSNorm (Zhang &amp; Sennrich 2019) bỏ trừ trung bình và bias.</li>
+<li><b>Residual</b>: $\operatorname{Residual}(\mathbf x,f)=f(\mathbf x)+\mathbf x$ – chống vanishing gradient, $f$ chỉ học phần khác biệt.</li>
+<li><b>Pre-LN</b> (norm trước sublayer) tốt hơn cho lan truyền gradient so với Post-LN.</li></ul>
+<h3>6. Feed-forward</h3>
+$$\operatorname{FFN}(\mathbf x)=f(\mathbf xW_1+\mathbf b_1)W_2+\mathbf b_2$$
+<ul><li>Trích đặc trưng tổ hợp từ đầu ra attention. $f$: <b>ReLU</b> (Vaswani) $\max(0,x)$; <b>Swish/SiLU</b> (LLaMA) $x\odot\sigma(\beta x)$.</li></ul>
+<h3>7. Thủ thuật tối ưu</h3>
+<ul><li>SGD → Adam (momentum + chuẩn hóa theo độ lệch chuẩn) → Adam + lịch learning rate (warmup) → <b>AdamW</b> (weight decay đúng cách).</li></ul>
+$$lr=d_{model}^{-0.5}\cdot\min\!\big(s^{-0.5},\ s\cdot w^{-1.5}\big)$$
+<p>với $s$ = bước hiện tại, $w$ = số bước warmup.</p>
+<ul><li>Huấn luyện độ chính xác thấp (fp16/bf16); theo dõi chuẩn gradient; hỏng thì quay về checkpoint, xáo dữ liệu, chạy tiếp.</li></ul>
+<h3>8. Transformer gốc vs LLaMA</h3>
+<table><tr><th></th><th>Vaswani et al.</th><th>LLaMA</th></tr>
+<tr><td>Vị trí norm</td><td>Post</td><td>Pre</td></tr>
+<tr><td>Loại norm</td><td>LayerNorm</td><td>RMSNorm</td></tr>
+<tr><td>Phi tuyến</td><td>ReLU</td><td>SiLU</td></tr>
+<tr><td>Mã hóa vị trí</td><td>Sinusoidal</td><td>RoPE</td></tr></table>
+<p>"Transformer++" (≈ LLaMA) hiệu quả hơn ≈ <b>10 lần</b> (Gu &amp; Dao 2023). <span class="ext">Mở rộng</span> Transformer-base: 6+6 tầng, $d_{model}=512$, 8 head, $d_k=64$, $d_{ff}=2048$; độ phức tạp self-attention $O(n^2 d)$.</p>
+`,
+
+"6.2": String.raw`
+<h3>1. Bối cảnh</h3>
+<table><tr><th></th><th>ELMo (2018)</th><th>OpenAI GPT (2018/6)</th><th>BERT (2018/10)</th></tr>
+<tr><td>Kiến trúc</td><td>2 LSTM LM một chiều riêng (L→R, R→L)</td><td>Transformer decoder, L→R</td><td>Transformer <b>encoder</b>, <b>hai chiều</b></td></tr>
+<tr><td>Cách dùng</td><td>Feature-based</td><td>Fine-tuning</td><td>Fine-tuning</td></tr>
+<tr><td>Dữ liệu</td><td>Câu đơn, 1B Word</td><td>512 token, BooksCorpus</td><td>Wikipedia 2,5B + BooksCorpus 0,8B</td></tr></table>
+<ul><li><b>Feature-based</b>: dùng biểu diễn tiền huấn luyện làm đặc trưng cho mô hình riêng. <b>Fine-tuning</b>: thêm tối thiểu tham số, cập nhật toàn bộ → không cần kiến trúc riêng, mạnh hơn.</li>
+<li>BERT: NAACL 2019 best paper. Cần ngữ cảnh 2 phía: "river <b>bank</b>" vs "go to <b>bank</b> to make a deposit".</li></ul>
+<h3>2. Masked Language Modeling (MLM)</h3>
+<ul><li>Không thể dùng LM thường cho mô hình hai chiều (từ "nhìn thấy chính nó") → che rồi dự đoán.</li>
+<li>Chọn <b>15%</b> token (lấy mẫu đều). Quá ít: tốn tính toán; quá nhiều: thiếu ngữ cảnh. Cải tiến: span masking (SpanBERT, T5), PMI masking.</li>
+<li><b>80-10-10</b>: 80% → [MASK], 10% → từ ngẫu nhiên, 10% giữ nguyên — vì [MASK] không xuất hiện khi fine-tune.</li></ul>
+$$\mathcal L_{MLM}=-\sum_{i\in\mathcal M}\log P(x_i\mid \tilde{\mathbf x})$$
+<h3>3. Next Sentence Prediction (NSP)</h3>
+<ul><li>Động cơ: NLI, paraphrase, QA cần quan hệ 2 câu. 50% đoạn liền kề (IsNext), 50% đoạn ngẫu nhiên (NotNext).</li>
+<li><b>[CLS]</b> luôn ở đầu (tiền huấn luyện cho NSP); <b>[SEP]</b> ngăn 2 đoạn. MLM và NSP huấn luyện cùng lúc.</li></ul>
+<h3>4. Cấu hình</h3>
+<ul><li>Từ vựng <b>30.000 WordPiece</b>. Input = token + segment + position embedding.</li></ul>
+<table><tr><th></th><th>Tầng</th><th>Hidden</th><th>Head</th><th>Tham số</th></tr>
+<tr><td>BERT-base</td><td>12</td><td>768</td><td>12</td><td>110M (= GPT)</td></tr>
+<tr><td>BERT-large</td><td>24</td><td>1024</td><td>16</td><td>340M</td></tr></table>
+<p>Tối đa 512 word piece (~256 + 256); 1M bước, batch 128k token.</p>
+<h3>5. Fine-tuning – "Pretrain once, finetune many times"</h3>
+<ul><li><b>Cấp câu</b> (MNLI: entailment/contradiction/neutral; QQP: duplicate?; SST-2: cảm xúc): bộ phân lớp tuyến tính trên <b>[CLS]</b>, thêm $C\times h$ tham số.</li>
+<li><b>Cấp token</b> (NER CoNLL-2003 BIO; QA trích xuất SQuAD – dự đoán vị trí bắt đầu/kết thúc): bộ phân lớp trên biểu diễn ẩn từng token.</li>
+<li>GLUE: 6 bài cặp câu + 2 bài câu đơn.</li></ul>
+<h3>6. Ablation</h3>
+<ul><li>MLM ≫ LM trái→phải; NSP giúp một số bài (sau này RoBERTa, SpanBERT cho rằng không cần).</li>
+<li>Càng lớn càng tốt. MLM hội tụ chậm hơn chút vì chỉ dự đoán 15% token.</li></ul>
+<h3>7. Sau BERT</h3>
+<table><tr><th>Mô hình</th><th>Điểm chính</th></tr>
+<tr><td>RoBERTa</td><td>Dữ liệu ×10, lâu hơn, bỏ NSP; SQuAD 94,6 vs 90,9</td></tr>
+<tr><td>ALBERT</td><td>Chia sẻ tham số giữa các tầng: ít bộ nhớ, mạnh nhưng chậm</td></tr>
+<tr><td>ELECTRA</td><td>Học trên 100% token (replaced token detection)</td></tr>
+<tr><td>Longformer, BigBird</td><td>Ngữ cảnh dài ≫ 512</td></tr>
+<tr><td>mBERT</td><td>104 ngôn ngữ, 110k WordPiece chung</td></tr>
+<tr><td>SciBERT, BioBERT, FinBERT, ClinicalBERT</td><td>Chuyên ngành</td></tr>
+<tr><td>DistilBERT, TinyBERT</td><td>Nhỏ gọn (chưng cất)</td></tr></table>
+<ul><li>BERT không hợp sinh văn bản; các mô hình lớn nhất hiện nay là một chiều (decoder-only) – dễ sinh, học trên mọi token.</li>
+<li><span class="ext">Mở rộng</span> Tiếng Việt: PhoBERT (RoBERTa, cần tách từ trước), XLM-R; bi-encoder (SBERT) vs cross-encoder cho truy hồi.</li></ul>
+`
+};
+
 const LESSONS=[["1","Bài 1 · NLP & ứng dụng"],["2","Bài 2 · Đặc trưng & NB"],["3","Bài 3 · Word embeddings"],["4","Bài 4 · RNN/LSTM"],["5","Bài 5 · Seq2Seq & Attention"],["6.1","Bài 6.1 · Transformer"],["6.2","Bài 6.2 · BERT"]];
 const LNAME=Object.fromEntries(LESSONS);
 const DB=[...[...Q_A,...Q_B,...Q_C].map(r=>[r,'S']),...[...QX_A,...QX_B,...QX_C].map(r=>[r,'X'])].map(([r,s],i)=>({id:s+'|'+r[2],src:s,l:r[0],lv:r[1],q:r[2],a:r[3],w:[r[4],...r[5]],e:r[6]}));
@@ -664,7 +984,7 @@ function pick(k){
   if(right){S.score++;if(mode==='wrong'){wrongSet.delete(q.id)}}
   else{wrongSet.add(q.id);S.wrongNow.push(q)}
   saveWrong();
-  document.getElementById('expBox').innerHTML=`<div class="exp"><b>${right?'✓ Chính xác':'✗ Chưa đúng'} — Đáp án: ${esc(q.a)}</b>${esc(q.e)}</div>`;
+  document.getElementById('expBox').innerHTML=`<div class="exp"><b>${right?'✓ Chính xác':'✗ Chưa đúng'} — Đáp án: ${esc(q.a)}</b>${esc(q.e)}</div><div class="swipehint">← Vuốt trái hoặc phải để sang câu tiếp →</div>`;
   const nb=document.getElementById('nextB');nb.textContent=S.i+1<S.list.length?'Câu tiếp →':'Xem kết quả →';
   stage.querySelector('.meta span:last-child').textContent=`Đúng ${S.score}/${S.answered}`;
 }
@@ -707,7 +1027,7 @@ function renderF(){
     <div class="face back"><div class="small">Đáp án</div><div class="ans">${esc(q.a)}</div><div>${esc(q.e)}</div></div>
   </div></div>
   <div class="actions"><button class="btn badb" id="no">✗ Chưa thuộc</button><button class="btn" id="fl">Lật thẻ</button><button class="btn okb" id="yes">✓ Đã thuộc</button></div>
-  <div class="hint">Space / click để lật · ← chưa thuộc (thẻ quay lại cuối bộ) · → đã thuộc</div>`;
+  <div class="hint">Space / click để lật · ← chưa thuộc (thẻ quay lại cuối bộ) · → đã thuộc</div><div class="swipehint">Chạm để lật · vuốt trái: chưa thuộc · vuốt phải: đã thuộc</div>`;
   F.flipped=false;
   const card=document.getElementById('card');
   card.onclick=flip;document.getElementById('fl').onclick=flip;
@@ -725,11 +1045,51 @@ function renderList(){
   draw('');document.getElementById('sq').oninput=e=>draw(e.target.value);
 }
 
+// ---------- notes ----------
+let noteL=null;
+function renderNotes(){
+  if(!noteL||!NOTES[noteL])noteL=[...selL].sort()[0]||'1';
+  const body=NOTES[noteL];
+  stage.innerHTML=`<div class="row" id="nl">${LESSONS.map(([k,n])=>`<button class="chip ${k===noteL?'on':''}" data-n="${k}">${n.split(' · ')[0]}</button>`).join('')}</div>
+  <h2 style="font-size:20px;margin:16px 0 0">${LNAME[noteL]}</h2>
+  <div class="toc" id="toc"></div><div class="notes" id="nb">${body}</div>
+  <div class="actions"><button class="btn" id="nPrev">← Bài trước</button><button class="btn pri" id="nQuiz">Làm quiz bài này</button><button class="btn" id="nNext">Bài sau →</button></div>`;
+  const hs=[...stage.querySelectorAll('#nb h3')];
+  hs.forEach((h,i)=>h.id='sec'+i);
+  document.getElementById('toc').innerHTML=hs.map((h,i)=>`<a href="#" data-s="${i}">${esc(h.textContent.replace(/^\d+\.\s*/,''))}</a>`).join('');
+  document.getElementById('toc').onclick=e=>{const a=e.target.closest('[data-s]');if(!a)return;e.preventDefault();document.getElementById('sec'+a.dataset.s).scrollIntoView({behavior:'smooth',block:'start'})};
+  document.getElementById('nl').onclick=e=>{const b=e.target.closest('[data-n]');if(b){noteL=b.dataset.n;renderNotes();stage.scrollIntoView({block:'start'})}};
+  const ks=LESSONS.map(x=>x[0]),ix=ks.indexOf(noteL);
+  const pv=document.getElementById('nPrev'),nx=document.getElementById('nNext');
+  pv.disabled=ix===0;nx.disabled=ix===ks.length-1;
+  pv.onclick=()=>{noteL=ks[ix-1];renderNotes();stage.scrollIntoView({block:'start'})};
+  nx.onclick=()=>{noteL=ks[ix+1];renderNotes();stage.scrollIntoView({block:'start'})};
+  document.getElementById('nQuiz').onclick=()=>{selL=new Set([noteL]);drawLessons();document.querySelector('.tab[data-m=quiz]').click()};
+  typesetMath(document.getElementById('nb'));
+}
+function typesetMath(el,tries=0){
+  if(window.renderMathInElement){try{renderMathInElement(el,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],output:'mathml',throwOnError:false,strict:false})}catch(e){}}
+  else if(tries<40)setTimeout(()=>typesetMath(el,tries+1),150);
+}
+
+// ---------- swipe (mobile) ----------
+let tx=null,ty=null;
+stage.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+stage.addEventListener('touchend',e=>{
+  if(tx===null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;tx=null;
+  if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.5)return;
+  const dir=dx<0?'out-l':'out-r';
+  const go=fn=>{stage.classList.add(dir);setTimeout(()=>{fn();stage.classList.remove(dir)},160)};
+  if((mode==='quiz'||mode==='wrong')&&S.list&&S.i<S.list.length&&S.picked!==null)go(next);
+  else if(mode==='flash'&&F.deck&&F.deck.length)go(()=>fAns(dx>0));
+},{passive:true});
+
 // ---------- routing ----------
-function restart(){info();
+function restart(){info();document.getElementById('filt').style.display=mode==='notes'?'none':'';
   if(mode==='quiz')startQuiz(pool(),'Quiz');
   else if(mode==='wrong')startQuiz(pool().filter(q=>wrongSet.has(q.id)),'Ôn câu sai');
   else if(mode==='flash')startFlash();
+  else if(mode==='notes')renderNotes();
   else renderList();
 }
 document.addEventListener('keydown',e=>{
